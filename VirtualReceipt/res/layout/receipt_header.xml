@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Done by Xiaolu -->
+
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" 
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"> 
+        
+     <ImageView
+         android:id="@+id/receiptHeader"
+         android:layout_width="fill_parent"
+         android:layout_height="100dp"
+         android:clickable="false"
+         android:contentDescription="@string/logo"
+         android:gravity="center_vertical"
+         android:longClickable="false"
+         android:maxHeight="100dp"
+         android:maxWidth="400dp"
+         android:padding="10dp"
+         android:src="@drawable/receipts" />
+
+</LinearLayout>

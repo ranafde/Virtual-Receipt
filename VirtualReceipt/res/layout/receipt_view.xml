@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- edited by Xiaolu -->
+
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tableLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background"
+    android:stretchColumns="1" >
+
+       <ImageView
+           android:id="@+id/detailsHeader"
+           android:layout_width="wrap_content"
+           android:layout_height="100dp"
+           android:clickable="false"
+           android:contentDescription="@string/logo"
+           android:longClickable="false"
+           android:src="@drawable/receiptdetails" />
+
+   
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:padding="3dip"
+            android:text="@string/description"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dip"
+            android:textSize="16sp" />
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:padding="3dip"
+            android:text="@string/amount"
+            android:textSize="16sp" />
+        
+        <TextView 
+            android:id="@+id/amount"
+	     	android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	    	android:padding="3dip"
+	    	android:textSize="16sp" />
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:padding="3dip"
+            android:text="@string/date"
+            android:textSize="16sp" />
+        
+        <TextView
+            android:id="@+id/date"
+    		android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	    	android:padding="3dip"
+	    	android:textSize="16sp" />
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:padding="3dip"
+            android:text="@string/category"
+            android:textSize="16sp" />
+        
+        <TextView
+			android:id="@+id/category"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="3dip"
+			android:textSize="16sp" />
+
+    </TableRow>
+    
+    <TableRow
+        android:id="@+id/tableRow5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:padding="3dip"
+            android:text="@string/payment_method"
+            android:textSize="16sp" />
+        
+        <TextView
+			android:id="@+id/payment"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="3dip"
+			android:textSize="16sp" />
+
+    </TableRow>
+    
+    <Button
+        android:id="@+id/button_view_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        style="@style/ButtonText"
+        android:background="@drawable/button"
+        android:layout_marginTop="30dp"
+        android:onClick="onViewImageClick"
+        android:text="@string/view_image" />
+    
+    <Button
+	        android:id="@+id/button_delete"
+	        android:layout_width="wrap_content"
+	        style="@style/ButtonText"
+	        android:background="@drawable/button"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="20dp"
+	        android:layout_marginRight="20dp"
+	        android:onClick="onDeleteClick"
+	        android:text="@string/delete" />
+
+
+</TableLayout>
+ 
