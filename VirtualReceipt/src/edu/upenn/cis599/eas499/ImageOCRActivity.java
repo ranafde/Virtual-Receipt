@@ -22,12 +22,9 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.Point;
 import android.graphics.Rect;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -36,9 +33,6 @@ import android.widget.Toast;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import edu.upenn.cis599.R;
-import edu.upenn.cis599.R.id;
-import edu.upenn.cis599.R.layout;
-
 
 
 public class ImageOCRActivity extends Activity {
@@ -55,12 +49,9 @@ public class ImageOCRActivity extends Activity {
 
 	private Bitmap	mBitmap;
 	private MyView mView;
-	
 	private boolean doneClicked = false;
-	
 	private TessBaseAPI baseApi;
-	private Camera mCamera;
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -110,11 +101,11 @@ public class ImageOCRActivity extends Activity {
 				Log.e(TAG, "Was unable to copy " + lang + " traineddata " + e.toString());
 			}
 		}
+		
 		Bundle extras = getIntent().getExtras();
 		MODE = extras.getInt("mode");
-//		byte[] imageByteArray = extras.getByteArray("image");
-		
 		byte[] imageByteArray = null;
+		
 		if(MODE == 0){
 			Log.v(TAG, "Photo accepted. Converting to bitmap.");
 			try{
@@ -126,9 +117,10 @@ public class ImageOCRActivity extends Activity {
 				// added by charles, scale the bitmap to screen size
 				Display display = getWindowManager().getDefaultDisplay(); 
 				int width = display.getWidth();
-				int height = display.getHeight() * 8 / 10;
-
-				photo = Bitmap.createScaledBitmap(photo, height, width, true);
+				int height = display.getHeight();
+				
+				/* position of heigt and width in function call was incorrect */
+				photo = Bitmap.createScaledBitmap(photo, width, height, true); 
 				
 				ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
 				photo.compress(CompressFormat.PNG, 0, outputStream);
@@ -136,20 +128,20 @@ public class ImageOCRActivity extends Activity {
 				imageByteArray = outputStream.toByteArray();
 				
 			}catch(Exception e){
-				Log.v(TAG, "Decoding Error");
+				Log.e(TAG, "Decoding Error");
 			}
 		}else{
 			imageByteArray = extras.getByteArray("image");
 		}
 		
-
 		if (imageByteArray != null) {
 			Bitmap imageBitmap = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.length);
 			mBitmap = imageBitmap.copy(Bitmap.Config.ARGB_8888, true);
 			if (mBitmap.getWidth() > mBitmap.getHeight()) {
 				Matrix m = new Matrix();
-				m.postRotate(90);
-				mBitmap = Bitmap.createBitmap(mBitmap , 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), m, true).copy(Bitmap.Config.ARGB_8888, true);
+				//m.postRotate(90); /* Rotation shold not be done on image height. We have to check camera orientation. To be fixed next week */
+				mBitmap = Bitmap.createBitmap(mBitmap , 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), m, true)
+								.copy(Bitmap.Config.ARGB_8888, true);
 			}
 			imageBitmap.recycle();
 		}
@@ -173,16 +165,8 @@ public class ImageOCRActivity extends Activity {
 			selectRegion();
 		}
 	}
-	
-//	private void initCamera() {
-//	     if(mCamera == null) {
-//	          mCamera = Camera.open();
-//	          mCamera.setDisplayOrientation(90);
-//	          CameraUtil.setCameraDisplayOrientation(this, CameraInfo.CAMERA_FACING_BACK, mCamera);
-//	          mCamera.unlock();
-//	      }
-//	}
 
+	
 	private void selectRegion() {
 		setContentView(R.layout.image_ocr_view);
 		mView = (MyView) findViewById(R.id.myview);
@@ -206,49 +190,24 @@ public class ImageOCRActivity extends Activity {
 			Rect descRect = mView.getDescRect();
 			if (amountRect != null) {
 				Log.v(TAG, "Before baseApi");
-				
-				// Set whitelist to numbers only to improve accuracy when determining amount
-				/*Log.v(TAG, "Before baseApi");
-	
-				TessBaseAPI baseApi = new TessBaseAPI();
-				baseApi.setDebug(true);
-				baseApi.setVariable("tessedit_char_whitelist", "0123456789.$");
-				baseApi.init(DATA_PATH, lang);
-				baseApi.setImage(photo);
-	
-				String recognizedText = baseApi.getUTF8Text();
-	
-				baseApi.clear();
-				baseApi.end();
-	
-				Log.v(TAG, "OCRED TEXT: " + recognizedText);
-	
-				if ( lang.equalsIgnoreCase("eng") ) {
-					recognizedText = recognizedText.replaceAll("[^a-zA-Z0-9]+", " ");
-				}
-	
-				recognizedText = recognizedText.trim();
-				ocrText = recognizedText;*/
-//				if (MODE == 0) {
-//					//baseApi.setVariable("tessedit_char_whitelist", "0123456789.");
-//					baseApi.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, WHITELIST);
-//				}
+
 				baseApi.setImage(mBitmap);
-				
+				Log.v(TAG, "Bit map set");
 				baseApi.setVariable("tessedit_char_whitelist", "0123456789.$");
 				baseApi.setRectangle(amountRect);
+				Log.v(TAG, "Amount rect set");
 	
 				String recognizedAmount = baseApi.getUTF8Text();
+				Log.v(TAG, "read the amount");
+				
 				if(recognizedAmount == null || recognizedAmount.equals(""))
-					//throw new RuntimeException("error recognizing amount");
-					Log.v("result", "can't recognize");
+					Log.e("result", "can't recognize");
 				
 				baseApi.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, WHITELIST);
 				baseApi.setRectangle(descRect);
 				String recognizedDesc = baseApi.getUTF8Text();
 				if(recognizedDesc == null || recognizedAmount.equals(""))
-					//throw new RuntimeException("error recognizing description");
-					Log.v("result", "can't recognize");
+					Log.e("result", "can't recognize");
 				
 				baseApi.clear();
 				baseApi.end();
@@ -264,7 +223,7 @@ public class ImageOCRActivity extends Activity {
 				switch (MODE) {
 					// When called from receipt entry
 					case 0:
-						mBitmap.recycle();
+						//mBitmap.recycle();  /* A bit map can not be recycled twice. This was causing the app to crash */
 						Intent resultIntent = new Intent();
 						resultIntent.putExtra("ocr-amount", recognizedAmount);
 						resultIntent.putExtra("ocr-desc", recognizedDesc);
