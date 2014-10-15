@@ -47,94 +47,92 @@ public class PieChartPayment extends MyChartHelper {
 	 *            the context
 	 * @return the built intent
 	 */
-	/* meaningless variable names */
 	@Override
 	public Intent execute(Context context) {
-		ReceiptDbAdapter mDbHelper = new ReceiptDbAdapter(context);
-		mDbHelper.open();
-
-		HashMap<String, Double> paymentSum = mDbHelper.retrieveDataByPayment(0);
-		ArrayList<String> paymentList = new ArrayList<String>();
-		ArrayList<Double> sumList = new ArrayList<Double>();
-		for (String payment : paymentSum.keySet()) {
-			paymentList.add(payment);
-			sumList.add(paymentSum.get(payment));
-		}
-
-		DefaultRenderer renderer = buildCategoryRenderer(paymentSum.size());
-		renderer.setZoomButtonsVisible(true);
-		renderer.setZoomEnabled(true);
-		renderer.setChartTitleTextSize(15);
-
-		mDbHelper.close();
+		ArrayList<String> paymentTypeList = new ArrayList<String>();
+		ArrayList<Double> totalAmountForEachPaymentTypeList = new ArrayList<Double>();
+		int numberOfPaymentTypes = buildParametersForPieChartIntent(context, 0,
+				paymentTypeList, totalAmountForEachPaymentTypeList);
+		DefaultRenderer renderer = buildCategoryRenderer(numberOfPaymentTypes);
+		setDefaultRenderer(renderer, 1);
 		return ChartFactory.getPieChartIntent(
 				context,
-				buildCategoryDataset("Payment Type Spending", paymentList,
-						sumList), renderer, "Payment Type Spending");
+				buildCategoryDataset("Payment Type Spending", paymentTypeList,
+						totalAmountForEachPaymentTypeList), renderer,
+				"Payment Type Spending");
 	}
 
 	/**
 	 * Get the Spending by Payment Type View within specified duration
 	 */
-	/* dupicate code, similar to execute() method */
-	/* long method, need to be modularized */
 	public GraphicalView getPaymentView(Context context, int duration) {
-		ReceiptDbAdapter mDbHelper = new ReceiptDbAdapter(context);
-		mDbHelper.open();
-
-		HashMap<String, Double> paymentSum = mDbHelper
-				.retrieveDataByPayment(duration);
-		ArrayList<String> paymentList = new ArrayList<String>();
-		ArrayList<Double> sumList = new ArrayList<Double>();
-		for (String payment : paymentSum.keySet()) {
-			paymentList.add(payment);
-			sumList.add(paymentSum.get(payment));
-		}
-
-		DefaultRenderer renderer = buildCategoryRenderer(paymentSum.size());
-		/* renderer should be set in another method */
-		renderer.setChartTitleTextSize(20);
-		renderer.setPanEnabled(false);
-		renderer.setZoomEnabled(false);
-		renderer.setShowLabels(true);
-
-		// renderer.isDisplayValues();
-		renderer.setDisplayValues(true);
-		renderer.setStartAngle(45);
-
-		renderer.setLabelsTextSize(15);
-		renderer.setLegendTextSize(15);
-		// Set the color gradient and highlight the first slice.
-		/* SimpleSeriesRenderer r should be declared outside the loop */
-		for (int i = 0; i < renderer.getSeriesRendererCount(); i++) {
-			SimpleSeriesRenderer r = renderer.getSeriesRendererAt(i);
-			r.setGradientEnabled(true);
-			int endColor = r.getColor();
-			int startColor = lighten(endColor);
-			r.setGradientStart(0, startColor);
-			r.setGradientStop(0, endColor);
-			if (i == 0)
-				r.setHighlighted(true);
-		}
-
-		String chartTitle;
+		ArrayList<String> paymentTypeList = new ArrayList<String>();
+		ArrayList<Double> totalAmountForEachPaymentTypeList = new ArrayList<Double>();
+		int numberOfPaymentTypes = buildParametersForPieChartIntent(context,
+				duration, paymentTypeList, totalAmountForEachPaymentTypeList);
+		DefaultRenderer renderer = buildCategoryRenderer(numberOfPaymentTypes);
+		setDefaultRenderer(renderer, 2);
+		String pieChartTitle;
 		switch (duration) {
 		case 1:
-			chartTitle = "Current Year";
+			pieChartTitle = "Current Year";
 			break;
 		case 2:
-			chartTitle = "All Time";
+			pieChartTitle = "All Time";
 			break;
 		default:
-			chartTitle = "Current Month";
+			pieChartTitle = "Current Month";
 			break;
 		}
-		renderer.setChartTitle(chartTitle);
-
-		mDbHelper.close();
-		return ChartFactory.getPieChartView(context,
-				buildCategoryDataset(chartTitle, paymentList, sumList),
-				renderer);
+		renderer.setChartTitle(pieChartTitle);
+		return ChartFactory.getPieChartView(
+				context,
+				buildCategoryDataset(pieChartTitle, paymentTypeList,
+						totalAmountForEachPaymentTypeList), renderer);
 	}
 
+	private int buildParametersForPieChartIntent(Context context, int duration,
+			ArrayList<String> paymentTypeList,
+			ArrayList<Double> totalAmountForEachPaymentTypeList) {
+		ReceiptDbAdapter mDbHelper = new ReceiptDbAdapter(context);
+		mDbHelper.open();
+		HashMap<String, Double> paymentData = mDbHelper
+				.retrieveDataByPayment(duration);
+		for (String payment : paymentData.keySet()) {
+			paymentTypeList.add(payment);
+			totalAmountForEachPaymentTypeList.add(paymentData.get(payment));
+		}
+		mDbHelper.close();
+		return paymentData.size();
+	}
+
+	private void setDefaultRenderer(DefaultRenderer renderer, int option) {
+		switch (option) {
+		case 1:
+			renderer.setZoomButtonsVisible(true);
+			renderer.setZoomEnabled(true);
+			renderer.setChartTitleTextSize(15);
+		case 2:
+			renderer.setChartTitleTextSize(20);
+			renderer.setPanEnabled(false);
+			renderer.setZoomEnabled(false);
+			renderer.setShowLabels(true);
+			renderer.setDisplayValues(true);
+			renderer.setStartAngle(45);
+			renderer.setLabelsTextSize(15);
+			renderer.setLegendTextSize(15);
+			// Set the color gradient and highlight the first slice.
+			for (int i = 0; i < renderer.getSeriesRendererCount(); i++) {
+				SimpleSeriesRenderer simpleSeriesRenderer = renderer
+						.getSeriesRendererAt(i);
+				simpleSeriesRenderer.setGradientEnabled(true);
+				int endColor = simpleSeriesRenderer.getColor();
+				int startColor = lighten(endColor);
+				simpleSeriesRenderer.setGradientStart(0, startColor);
+				simpleSeriesRenderer.setGradientStop(0, endColor);
+				if (i == 0)
+					simpleSeriesRenderer.setHighlighted(true);
+			}
+		}
+	}
 }
