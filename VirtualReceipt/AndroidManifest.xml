@@ -15,7 +15,7 @@
 
     <application
         android:icon="@drawable/icon2"
-        android:label="@string/app_name" android:debuggable="true">
+        android:label="@string/app_name" >
         <activity
             android:name=".eas499.VirtualReceiptActivity"
             android:label="@string/app_name" 
@@ -143,7 +143,7 @@
      		android:configChanges="orientation|keyboard">
       		<intent-filter>
         	<!-- Change this to be db- followed by your app key -->
-        	<data android:scheme="db-dc36xrc9680qj3w" />
+        	<data android:scheme="db-w9bii3r2hidx7jp" />
         	<action android:name="android.intent.action.VIEW" />
         	<category android:name="android.intent.category.BROWSABLE"/>
         	<category android:name="android.intent.category.DEFAULT" />

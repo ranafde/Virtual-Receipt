@@ -45,9 +45,11 @@ public class DropboxActivity extends Activity {
     // Note that this is a really insecure way to do this, and you shouldn't
     // ship code which contains your key & secret in such an obvious way.
     // Obfuscation is good.
-    final static private String APP_KEY = "dc36xrc9680qj3w";
-    final static private String APP_SECRET = "t7roqse0foysbru";
-
+    //final static private String APP_KEY = "dc36xrc9680qj3w";
+    //final static private String APP_SECRET = "t7roqse0foysbru";
+	final static private String APP_KEY = "w9bii3r2hidx7jp";
+    final static private String APP_SECRET = "uxrrek6sgqf6uv0";
+    
     // If you'd like to change the access type to the full Dropbox instead of
     // an app folder, change this value.
     // This statement will lead to failure

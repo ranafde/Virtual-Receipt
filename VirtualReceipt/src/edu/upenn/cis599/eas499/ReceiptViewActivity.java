@@ -58,8 +58,10 @@ public class ReceiptViewActivity extends Activity {
 
 	// added by charles 11.21
 	DropboxAPI<AndroidAuthSession> mApi = null;
-    final static private String APP_KEY = "dc36xrc9680qj3w";
-    final static private String APP_SECRET = "t7roqse0foysbru";
+    //final static private String APP_KEY = "dc36xrc9680qj3w";
+    //final static private String APP_SECRET = "t7roqse0foysbru";
+    final static private String APP_KEY = "w9bii3r2hidx7jp";
+    final static private String APP_SECRET = "uxrrek6sgqf6uv0";
     final static private AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
     final static private String ACCOUNT_PREFS_NAME = "prefs";
     final static private String ACCESS_KEY_NAME = "ACCESS_KEY";
