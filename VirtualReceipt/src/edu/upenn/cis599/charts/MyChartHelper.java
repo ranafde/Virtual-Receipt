@@ -46,11 +46,13 @@ public abstract class MyChartHelper implements MyChartInterface {
 		return dataset;
 	}
 
+	/* return XYMultipleSeriesDataset object instead of void */
 	public void addXYSeries(XYMultipleSeriesDataset dataset, String[] titles,
 			List<double[]> xValues, List<double[]> yValues, int scale) {
 		int length = titles.length;
 		for (int i = 0; i < length; i++) {
 			XYSeries series = new XYSeries(titles[i], scale);
+			/* change variable names xV and yV */
 			double[] xV = xValues.get(i);
 			double[] yV = yValues.get(i);
 			int seriesLength = xV.length;
@@ -77,6 +79,7 @@ public abstract class MyChartHelper implements MyChartInterface {
 		return renderer;
 	}
 
+	/* return XYMultipleSeriesRenderer object instead of void */
 	protected void setRenderer(XYMultipleSeriesRenderer renderer, int[] colors,
 			PointStyle[] styles) {
 		renderer.setAxisTitleTextSize(10);
@@ -118,6 +121,7 @@ public abstract class MyChartHelper implements MyChartInterface {
 	 * @param labelsColor
 	 *            the labels color
 	 */
+	/* return XYMultipleSeriesRenderer object instead of void */
 	protected void setChartSettings(XYMultipleSeriesRenderer mRenderer,
 			String title, String xTitle, String yTitle, double xMin,
 			double xMax, double yMin, double yMax, int axesColor,
@@ -148,6 +152,11 @@ public abstract class MyChartHelper implements MyChartInterface {
 	 * @param yValues
 	 *            the values for the Y axis
 	 * @return the XY multiple time dataset
+	 */
+
+	/*
+	 * redundant code, similar to buildDataset() method. make a new method that
+	 * is used by these two methods
 	 */
 	protected XYMultipleSeriesDataset buildDateDataset(String[] titles,
 			List<Date[]> xValues, List<double[]> yValues) {
@@ -206,6 +215,11 @@ public abstract class MyChartHelper implements MyChartInterface {
 	 *            the values
 	 * @return the category series
 	 */
+
+	/*
+	 * redundant code, similar to buildCategoryDataset. make a new method that
+	 * is used by both the methods
+	 */
 	protected MultipleCategorySeries buildMultipleCategoryDataset(String title,
 			List<String[]> titles, List<double[]> values) {
 		MultipleCategorySeries series = new MultipleCategorySeries(title);
@@ -232,6 +246,7 @@ public abstract class MyChartHelper implements MyChartInterface {
 		renderer.setLegendTextSize(10);
 		renderer.setMargins(new int[] { 20, 30, 15, 0 });
 		for (int color : colors) {
+			/* declare SimpleSeriesRenderer r outside the loop */
 			SimpleSeriesRenderer r = new SimpleSeriesRenderer();
 			r.setColor(color);
 			r.setDisplayChartValues(true);
@@ -273,6 +288,8 @@ public abstract class MyChartHelper implements MyChartInterface {
 	 *            the series renderers colors
 	 * @return the bar multiple series renderer
 	 */
+
+	/* duplicate code, similar to setRenderer(). */
 	protected XYMultipleSeriesRenderer buildBarRenderer(int[] colors) {
 		XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
 		renderer.setAxisTitleTextSize(8);
@@ -289,6 +306,7 @@ public abstract class MyChartHelper implements MyChartInterface {
 	}
 
 	protected List<Integer> getUniqueColors(int amount) {
+		/* assign rgb values to variable and assign those variables to colors */
 		int[] colors = new int[] { Color.rgb(129, 164, 238),
 				Color.rgb(143, 238, 149), Color.rgb(233, 126, 126),
 				Color.rgb(179, 144, 203), Color.rgb(255, 171, 96),
@@ -308,10 +326,13 @@ public abstract class MyChartHelper implements MyChartInterface {
 
 	/**
 	 * Lighten the given color
-	 * @param color original color
+	 * 
+	 * @param color
+	 *            original color
 	 * @return lightened color
 	 */
 	protected int lighten(int color) {
+		/* meaningless variable names */
 		double[] rgb = toRgb(color, 1.3);
 		System.out.println(Arrays.toString(rgb));
 		double[] tmp = rgb.clone();
@@ -330,8 +351,9 @@ public abstract class MyChartHelper implements MyChartInterface {
 	}
 
 	/**
-	 * Convert the given color in int to an double array of its rgb
-	 * value multiplied by a factor.
+	 * Convert the given color in int to an double array of its rgb value
+	 * multiplied by a factor.
+	 * 
 	 * @param color
 	 * @param factor
 	 * @return

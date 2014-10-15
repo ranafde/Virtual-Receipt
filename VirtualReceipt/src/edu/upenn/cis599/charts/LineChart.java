@@ -28,6 +28,7 @@ public class LineChart extends MyChartHelper {
 	 * 
 	 * @return the chart name
 	 */
+	@Override
 	public String getName() {
 		return "Monthly Spending";
 	}
@@ -37,6 +38,7 @@ public class LineChart extends MyChartHelper {
 	 * 
 	 * @return the chart description
 	 */
+	@Override
 	public String getDesc() {
 		return "The total spending of each month in current year";
 	}
@@ -48,25 +50,35 @@ public class LineChart extends MyChartHelper {
 	 *            the context
 	 * @return the built intent
 	 */
+
+	/* very long method. need to be modularized */
+	@Override
 	public Intent execute(Context context) {
 
 		ReceiptDbAdapter mDbHelper = new ReceiptDbAdapter(context);
 		mDbHelper.open();
+		/* change names of values, sumList, allList */
 		List<double[]> values = new ArrayList<double[]>();
 		double[] sumList = mDbHelper.retrieveMonthlyPayment(1);
 		double[] allList = mDbHelper.retrieveMonthlyPayment(2);
 		values.add(sumList);
 		values.add(allList);
 
+		/*
+		 * remove the string concatenation and assign it some variable. pass
+		 * that variable to titles
+		 */
 		String[] titles = new String[] {
 				"Year" + Calendar.getInstance().get(Calendar.YEAR)
 						+ " Monthly Spending", "All Time Monthly Spending" };
+		/* change name of x */
 		List<double[]> x = new ArrayList<double[]>();
 		for (int i = 0; i < titles.length; i++) {
 			x.add(new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
 		}
-
-		int[] colors = new int[] {Color.rgb(233, 126, 126), Color.rgb(129, 164, 238) };
+		/* remove Color.rgb and assign it to a variable describing the color */
+		int[] colors = new int[] { Color.rgb(233, 126, 126),
+				Color.rgb(129, 164, 238) };
 		PointStyle[] styles = new PointStyle[] { PointStyle.CIRCLE,
 				PointStyle.TRIANGLE };
 
@@ -76,17 +88,22 @@ public class LineChart extends MyChartHelper {
 			((XYSeriesRenderer) renderer.getSeriesRendererAt(i))
 					.setFillPoints(true);
 		}
+
+		/*
+		 * create an new method that configures the renderer object and returns
+		 * it, instead of doing it in the same method
+		 */
 		renderer.setXLabels(25);
 		renderer.setYLabels(25);
 		renderer.setShowGrid(true);
 		renderer.setXLabelsAlign(Align.CENTER);
 		renderer.setYLabelsAlign(Align.CENTER);
-		//legends and labels size
-	    renderer.setLegendTextSize(15);
-	    renderer.setLabelsTextSize(10);
-	    renderer.setLegendHeight(120);
-//	    renderer.setMargins(new int[] { 20, 30, 15, 20 });
-//	    mRenderer.setMargins(new int[] { 20, 30, 15, 0 });
+		// legends and labels size
+		renderer.setLegendTextSize(15);
+		renderer.setLabelsTextSize(10);
+		renderer.setLegendHeight(120);
+		// renderer.setMargins(new int[] { 20, 30, 15, 20 });
+		// mRenderer.setMargins(new int[] { 20, 30, 15, 0 });
 		// renderer.setApplyBackgroundColor(true);
 		// renderer.setBackgroundColor(Color.WHITE);
 		// renderer.setAxisTitleTextSize(16);
@@ -106,6 +123,7 @@ public class LineChart extends MyChartHelper {
 		renderer.setXLabels(0);
 
 		int rendererCount = renderer.getSeriesRendererCount();
+		/* not sure what this code snippet does. looks like its a junk code */
 		for (int i = 0; i < rendererCount; i++) {
 			XYSeriesRenderer seriesRenderer = (XYSeriesRenderer) renderer
 					.getSeriesRendererAt(i);

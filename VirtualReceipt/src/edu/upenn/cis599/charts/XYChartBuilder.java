@@ -61,6 +61,7 @@ public class XYChartBuilder extends Activity {
 
   private Button mNewSeries;
 
+  /* meaningless variable names */
   private Button mAdd;
 
   private EditText mX;
@@ -92,11 +93,13 @@ public class XYChartBuilder extends Activity {
   }
 
   @Override
+  /* long methods onCreate() and onResume() */
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.xy_chart);
     mX = (EditText) findViewById(R.id.xValue);
     mY = (EditText) findViewById(R.id.yValue);
+    /* set the mRender object in another function and return the values */
     mRenderer.setApplyBackgroundColor(true);
     mRenderer.setBackgroundColor(Color.WHITE);
     mRenderer.setAxisTitleTextSize(10);
@@ -112,7 +115,8 @@ public class XYChartBuilder extends Activity {
     mNewSeries = (Button) findViewById(R.id.new_series);
 //  }
     mNewSeries.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
+      @Override
+	public void onClick(View v) {
         String seriesTitle = "Series " + (mDataset.getSeriesCount() + 1);
         XYSeries series = new XYSeries(seriesTitle);
         mDataset.addSeries(series);
@@ -127,7 +131,8 @@ public class XYChartBuilder extends Activity {
     });
 
     mAdd.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
+      @Override
+	public void onClick(View v) {
         double x = 0;
         double y = 0;
         try {
@@ -210,7 +215,8 @@ public class XYChartBuilder extends Activity {
         }
       });
       mChartView.addZoomListener(new ZoomListener() {
-        public void zoomApplied(ZoomEvent e) {
+        @Override
+		public void zoomApplied(ZoomEvent e) {
           String type = "out";
           if (e.isZoomIn()) {
             type = "in";
@@ -218,12 +224,14 @@ public class XYChartBuilder extends Activity {
           System.out.println("Zoom " + type + " rate " + e.getZoomRate());
         }
         
-        public void zoomReset() {
+        @Override
+		public void zoomReset() {
           System.out.println("Reset");
         }
       }, true, true);
       mChartView.addPanListener(new PanListener() {
-        public void panApplied() {
+        @Override
+		public void panApplied() {
           System.out.println("New X range=[" + mRenderer.getXAxisMin() + ", " + mRenderer.getXAxisMax()
               + "], Y range=[" + mRenderer.getYAxisMax() + ", " + mRenderer.getYAxisMax() + "]");
         }
