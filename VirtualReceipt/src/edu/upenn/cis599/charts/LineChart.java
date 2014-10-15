@@ -93,6 +93,7 @@ public class LineChart extends MyChartHelper {
 		return result;
 	}
 
+	@SuppressWarnings("deprecation")
 	private void setXYMultipleSeriesRenderer(XYMultipleSeriesRenderer renderer) {
 		int length = renderer.getSeriesRendererCount();
 		for (int i = 0; i < length; i++) {
