@@ -33,31 +33,29 @@ public abstract class MyChartHelper implements MyChartInterface {
 	 * 
 	 * @param titles
 	 *            the series titles
-	 * @param xValues
+	 * @param xAxisValues
 	 *            the values for the X axis
-	 * @param yValues
+	 * @param yAxisValues
 	 *            the values for the Y axis
 	 * @return the XY multiple dataset
 	 */
 	protected XYMultipleSeriesDataset buildDataset(String[] titles,
-			List<double[]> xValues, List<double[]> yValues) {
+			List<double[]> xAxisValues, List<double[]> yAxisValues) {
 		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-		addXYSeries(dataset, titles, xValues, yValues, 0);
+		addXYSeries(dataset, titles, xAxisValues, yAxisValues, 0);
 		return dataset;
 	}
 
-	/* return XYMultipleSeriesDataset object instead of void */
 	public void addXYSeries(XYMultipleSeriesDataset dataset, String[] titles,
-			List<double[]> xValues, List<double[]> yValues, int scale) {
+			List<double[]> xAxisValues, List<double[]> yAxisValues, int scale) {
 		int length = titles.length;
 		for (int i = 0; i < length; i++) {
 			XYSeries series = new XYSeries(titles[i], scale);
-			/* change variable names xV and yV */
-			double[] xV = xValues.get(i);
-			double[] yV = yValues.get(i);
-			int seriesLength = xV.length;
+			double[] xValues = xAxisValues.get(i);
+			double[] yValues = yAxisValues.get(i);
+			int seriesLength = xValues.length;
 			for (int k = 0; k < seriesLength; k++) {
-				series.add(xV[k], yV[k]);
+				series.add(xValues[k], yValues[k]);
 			}
 			dataset.addSeries(series);
 		}
@@ -68,20 +66,19 @@ public abstract class MyChartHelper implements MyChartInterface {
 	 * 
 	 * @param colors
 	 *            the series rendering colors
-	 * @param styles
+	 * @param pointStyles
 	 *            the series point styles
 	 * @return the XY multiple series renderers
 	 */
 	protected XYMultipleSeriesRenderer buildRenderer(int[] colors,
-			PointStyle[] styles) {
+			PointStyle[] pointStyles) {
 		XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
-		setRenderer(renderer, colors, styles);
+		setRenderer(renderer, colors, pointStyles);
 		return renderer;
 	}
 
-	/* return XYMultipleSeriesRenderer object instead of void */
 	protected void setRenderer(XYMultipleSeriesRenderer renderer, int[] colors,
-			PointStyle[] styles) {
+			PointStyle[] pointStyles) {
 		renderer.setAxisTitleTextSize(10);
 		renderer.setChartTitleTextSize(15);
 		renderer.setLabelsTextSize(10);
@@ -92,7 +89,7 @@ public abstract class MyChartHelper implements MyChartInterface {
 		for (int i = 0; i < length; i++) {
 			XYSeriesRenderer r = new XYSeriesRenderer();
 			r.setColor(colors[i]);
-			r.setPointStyle(styles[i]);
+			r.setPointStyle(pointStyles[i]);
 			renderer.addSeriesRenderer(r);
 		}
 	}
@@ -104,129 +101,48 @@ public abstract class MyChartHelper implements MyChartInterface {
 	 *            the renderer to set the properties to
 	 * @param title
 	 *            the chart title
-	 * @param xTitle
+	 * @param xAxisTitle
 	 *            the title for the X axis
-	 * @param yTitle
+	 * @param yAxisTitle
 	 *            the title for the Y axis
-	 * @param xMin
+	 * @param minXValue
 	 *            the minimum value on the X axis
-	 * @param xMax
+	 * @param maxXValue
 	 *            the maximum value on the X axis
-	 * @param yMin
+	 * @param minYValue
 	 *            the minimum value on the Y axis
-	 * @param yMax
+	 * @param maxYValue
 	 *            the maximum value on the Y axis
 	 * @param axesColor
 	 *            the axes color
 	 * @param labelsColor
 	 *            the labels color
 	 */
-	/* return XYMultipleSeriesRenderer object instead of void */
 	protected void setChartSettings(XYMultipleSeriesRenderer mRenderer,
-			String title, String xTitle, String yTitle, double xMin,
-			double xMax, double yMin, double yMax, int axesColor,
-			int labelsColor) {
+			String title, String xAxisTitle, String yAxisTitle,
+			double minXValue, double maxXValue, double minYValue,
+			double maxYValue, int axesColor, int labelsColor) {
 		mRenderer.setChartTitle(title);
-		mRenderer.setXTitle(xTitle);
-		mRenderer.setYTitle(yTitle);
-		mRenderer.setXAxisMin(xMin);
-		mRenderer.setXAxisMax(xMax);
-		mRenderer.setYAxisMin(yMin);
-		mRenderer.setYAxisMax(yMax);
-
+		mRenderer.setXTitle(xAxisTitle);
+		mRenderer.setYTitle(yAxisTitle);
+		mRenderer.setXAxisMin(minXValue);
+		mRenderer.setXAxisMax(maxXValue);
+		mRenderer.setYAxisMin(minYValue);
+		mRenderer.setYAxisMax(maxYValue);
 		// Setting the background color of Line chart;
 		mRenderer.setApplyBackgroundColor(true);
 		mRenderer.setBackgroundColor(Color.BLACK);
-
 		mRenderer.setAxesColor(axesColor);
 		mRenderer.setLabelsColor(labelsColor);
-	}
-
-	/**
-	 * Builds an XY multiple time dataset using the provided values.
-	 * 
-	 * @param titles
-	 *            the series titles
-	 * @param xValues
-	 *            the values for the X axis
-	 * @param yValues
-	 *            the values for the Y axis
-	 * @return the XY multiple time dataset
-	 */
-
-	/*
-	 * redundant code, similar to buildDataset() method. make a new method that
-	 * is used by these two methods
-	 */
-	protected XYMultipleSeriesDataset buildDateDataset(String[] titles,
-			List<Date[]> xValues, List<double[]> yValues) {
-		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-		int length = titles.length;
-		for (int i = 0; i < length; i++) {
-			TimeSeries series = new TimeSeries(titles[i]);
-			Date[] xV = xValues.get(i);
-			double[] yV = yValues.get(i);
-			int seriesLength = xV.length;
-			for (int k = 0; k < seriesLength; k++) {
-				series.add(xV[k], yV[k]);
-			}
-			dataset.addSeries(series);
-		}
-		return dataset;
-	}
-
-	/**
-	 * Builds a category series using the provided values.
-	 * 
-	 * @param titles
-	 *            the series titles
-	 * @param values
-	 *            the values
-	 * @return the category series
-	 */
-	protected CategorySeries buildCategoryDataset(String title, double[] values) {
-		CategorySeries series = new CategorySeries(title);
-		int k = 0;
-		for (double value : values) {
-			series.add("Project " + ++k, value);
-		}
-
-		return series;
 	}
 
 	protected CategorySeries buildCategoryDataset(String title,
 			List<String> titles, List<Double> values) {
 		CategorySeries series = new CategorySeries(title);
-		int k = 0;
+		int i = 0;
 		for (double value : values) {
-			series.add(titles.get(k), value);
-			k++;
-		}
-
-		return series;
-	}
-
-	/**
-	 * Builds a multiple category series using the provided values.
-	 * 
-	 * @param titles
-	 *            the series titles
-	 * @param values
-	 *            the values
-	 * @return the category series
-	 */
-
-	/*
-	 * redundant code, similar to buildCategoryDataset. make a new method that
-	 * is used by both the methods
-	 */
-	protected MultipleCategorySeries buildMultipleCategoryDataset(String title,
-			List<String[]> titles, List<double[]> values) {
-		MultipleCategorySeries series = new MultipleCategorySeries(title);
-		int k = 0;
-		for (double[] value : values) {
-			series.add(titles.get(k), value);
-			k++;
+			series.add(titles.get(i), value);
+			i++;
 		}
 		return series;
 	}
@@ -246,67 +162,16 @@ public abstract class MyChartHelper implements MyChartInterface {
 		renderer.setLegendTextSize(10);
 		renderer.setMargins(new int[] { 20, 30, 15, 0 });
 		for (int color : colors) {
-			/* declare SimpleSeriesRenderer r outside the loop */
-			SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-			r.setColor(color);
-			r.setDisplayChartValues(true);
-			r.setChartValuesTextSize(8);
-			renderer.addSeriesRenderer(r);
-		}
-		return renderer;
-	}
-
-	/**
-	 * Builds a bar multiple series dataset using the provided values.
-	 * 
-	 * @param titles
-	 *            the series titles
-	 * @param values
-	 *            the values
-	 * @return the XY multiple bar dataset
-	 */
-	protected XYMultipleSeriesDataset buildBarDataset(String[] titles,
-			List<double[]> values) {
-		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-		int length = titles.length;
-		for (int i = 0; i < length; i++) {
-			CategorySeries series = new CategorySeries(titles[i]);
-			double[] v = values.get(i);
-			int seriesLength = v.length;
-			for (int k = 0; k < seriesLength; k++) {
-				series.add(v[k]);
-			}
-			dataset.addSeries(series.toXYSeries());
-		}
-		return dataset;
-	}
-
-	/**
-	 * Builds a bar multiple series renderer to use the provided colors.
-	 * 
-	 * @param colors
-	 *            the series renderers colors
-	 * @return the bar multiple series renderer
-	 */
-
-	/* duplicate code, similar to setRenderer(). */
-	protected XYMultipleSeriesRenderer buildBarRenderer(int[] colors) {
-		XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
-		renderer.setAxisTitleTextSize(8);
-		renderer.setChartTitleTextSize(10);
-		renderer.setLabelsTextSize(8);
-		renderer.setLegendTextSize(8);
-		int length = colors.length;
-		for (int i = 0; i < length; i++) {
-			SimpleSeriesRenderer r = new SimpleSeriesRenderer();
-			r.setColor(colors[i]);
-			renderer.addSeriesRenderer(r);
+			SimpleSeriesRenderer simpleSeriesRenderer = new SimpleSeriesRenderer();
+			simpleSeriesRenderer.setColor(color);
+			simpleSeriesRenderer.setDisplayChartValues(true);
+			simpleSeriesRenderer.setChartValuesTextSize(8);
+			renderer.addSeriesRenderer(simpleSeriesRenderer);
 		}
 		return renderer;
 	}
 
 	protected List<Integer> getUniqueColors(int amount) {
-		/* assign rgb values to variable and assign those variables to colors */
 		int[] colors = new int[] { Color.rgb(129, 164, 238),
 				Color.rgb(143, 238, 149), Color.rgb(233, 126, 126),
 				Color.rgb(179, 144, 203), Color.rgb(255, 171, 96),
@@ -332,20 +197,19 @@ public abstract class MyChartHelper implements MyChartInterface {
 	 * @return lightened color
 	 */
 	protected int lighten(int color) {
-		/* meaningless variable names */
 		double[] rgb = toRgb(color, 1.3);
 		System.out.println(Arrays.toString(rgb));
-		double[] tmp = rgb.clone();
+		double[] rgbClone = rgb.clone();
 		double threshold = 255.999;
-		Arrays.sort(tmp);
-		double m = tmp[2];
-		if (m <= threshold)
+		Arrays.sort(rgbClone);
+		double blue = rgbClone[2];
+		if (blue <= threshold)
 			return Color.rgb((int) rgb[0], (int) rgb[1], (int) rgb[2]);
 		double total = rgb[0] + rgb[1] + rgb[2];
 		if (total >= 3 * threshold)
 			return Color.rgb(255, 255, 255);
-		double x = (3 * threshold - total) / (3 * m - total);
-		double gray = threshold - x * m;
+		double x = (3 * threshold - total) / (3 * blue - total);
+		double gray = threshold - x * blue;
 		return Color.rgb((int) (gray + x * rgb[0]), (int) (gray + x * rgb[1]),
 				(int) (gray + x * rgb[2]));
 	}
