@@ -5,9 +5,6 @@
 package edu.upenn.cis599.eas499;
 
 import edu.upenn.cis599.R;
-import edu.upenn.cis599.R.anim;
-import edu.upenn.cis599.R.id;
-import edu.upenn.cis599.R.layout;
 import edu.upenn.cis599.charts.PieChartCategory;
 import edu.upenn.cis599.charts.PieChartPayment;
 import android.app.Activity;
@@ -59,6 +56,10 @@ public class ChartViewerActivity extends Activity {
 		Bundle extras = getIntent().getExtras();
 		int selection = extras.getInt("selection");
 		
+		setCharts(selection);
+	}	
+
+	private void setCharts(int selection){
 		LinearLayout currentMonthGraph = (LinearLayout) findViewById(R.id.current_month);
 		LinearLayout currentYearGraph = (LinearLayout) findViewById(R.id.current_year);
 		LinearLayout allTimeGraph = (LinearLayout) findViewById(R.id.all_time);
@@ -131,8 +132,8 @@ public class ChartViewerActivity extends Activity {
 		currentMonthGraph.setOnTouchListener(gestureListener);
 		currentYearGraph.setOnTouchListener(gestureListener);
 		allTimeGraph.setOnTouchListener(gestureListener);		
-	}	
-	
+
+	}
 	class MyGestureDetector extends SimpleOnGestureListener {
 	    @Override
 	    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
