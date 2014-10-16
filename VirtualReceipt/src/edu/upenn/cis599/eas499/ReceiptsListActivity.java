@@ -5,9 +5,6 @@
 package edu.upenn.cis599.eas499;
 
 import edu.upenn.cis599.R;
-import edu.upenn.cis599.R.id;
-import edu.upenn.cis599.R.layout;
-import edu.upenn.cis599.R.string;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -15,11 +12,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;

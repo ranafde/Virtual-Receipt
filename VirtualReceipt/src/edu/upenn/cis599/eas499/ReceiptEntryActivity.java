@@ -7,8 +7,6 @@ package edu.upenn.cis599.eas499;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,49 +21,36 @@ import java.util.GregorianCalendar;
 import java.util.concurrent.ExecutionException;
 
 import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.ProgressListener;
-import com.dropbox.client2.DropboxAPI.UploadRequest;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.android.AuthActivity;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
-import com.dropbox.client2.session.Session;
 import com.dropbox.client2.session.TokenPair;
 import com.dropbox.client2.session.Session.AccessType;
 
-import edu.upenn.cis599.CameraActivity;
-import edu.upenn.cis599.DropboxActivity;
 import edu.upenn.cis599.FinishListener;
 import edu.upenn.cis599.R;
 import edu.upenn.cis599.R.id;
-import edu.upenn.cis599.R.layout;
 import edu.upenn.cis599.SyncToDropbox;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
-import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.hardware.Camera;
-import android.hardware.Camera.CameraInfo;
 import android.media.ExifInterface;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -78,7 +63,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -99,7 +83,6 @@ public class ReceiptEntryActivity extends Activity {
 	private RadioGroup mPayment;
 	private Long mRowId;
 	private byte[] mImage;
-	//private Preview preview;
 
 	private String ocrAmount;
 	private String ocrDesc;
@@ -127,8 +110,6 @@ public class ReceiptEntryActivity extends Activity {
 	public static ArrayList<String> categoryList;
 	
 	private boolean isAddClicked = false;
-	
-	private Camera mCamera;
 	private long captureTime;
 	
 	// added by charles 18/11
@@ -146,8 +127,7 @@ public class ReceiptEntryActivity extends Activity {
     final static private String ACCESS_KEY_NAME = "ACCESS_KEY";
     final static private String ACCESS_SECRET_NAME = "ACCESS_SECRET";
     private boolean linking = false;
-    //private LinkDropBox dropbox;
-    // added by charles 11.21
+
     private SyncToDropbox upload = null;
 	
 	@Override
@@ -186,10 +166,7 @@ public class ReceiptEntryActivity extends Activity {
 						mImageCaptureUri = Uri.fromFile(imageFile);
 						cameraIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 						cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
-//						cameraIntent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 						startActivityForResult(cameraIntent, CAMERA_REQUEST);
-						//Intent cameraIntent = new Intent(getApplicationContext(), CameraActivity.class);
-						//startActivityForResult(cameraIntent, CAMERA_REQUEST);
 					} 
 				} catch (RuntimeException e) {
 					// Barcode Scanner has seen crashes in the wild of this variety:
@@ -202,9 +179,6 @@ public class ReceiptEntryActivity extends Activity {
 
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
-				// Insert empty image into db.
-				//Intent vr = new Intent(getApplicationContext(), VirtualReceiptActivity.class);
-				//startActivity(vr);
 				loadForm();
 			}
 		});
@@ -248,10 +222,6 @@ public class ReceiptEntryActivity extends Activity {
         testIntent.setData(Uri.parse(uri));
         PackageManager pm = getPackageManager();
         if (0 == pm.queryIntentActivities(testIntent, 0).size()) {
-     /*       showToast("URL scheme in your app's " +
-                    "manifest is not set up correctly. You should have a " +
-                    "com.dropbox.client2.android.AuthActivity with the " +
-                    "scheme: " + scheme);*/
             finish();
         }
     }
@@ -278,33 +248,6 @@ public class ReceiptEntryActivity extends Activity {
         edit.putString(ACCESS_SECRET_NAME, secret);
         edit.commit();
     }
-	
-//	private void initCamera() {
-//	     if(mCamera == null) {
-//	          mCamera = Camera.open();
-//	          mCamera.setDisplayOrientation(90);
-////	          CameraUtil.setCameraDisplayOrientation(this, CameraInfo.CAMERA_FACING_BACK, mCamera);
-//	          mCamera.unlock();
-//	      }
-//	}
-//	
-//	@Override
-//	protected void onPause(){
-//		super.onPause();
-//		mCamera.release();		
-//	}
-//	
-//	@Override
-//	protected void onResume(){
-//		super.onResume();
-//		try {
-//			if(mCamera == null)
-//				initCamera();
-//			mCamera.reconnect();
-//		} catch (IOException e) {
-//			 showErrorMessage("Error", "Could not reconnect the camera.");
-//		}		
-//	}
 	
 	private void initialize(){
 		String[] paths = new String[] { DATA_PATH, DATA_PATH + "tessdata/" };
@@ -421,33 +364,6 @@ public class ReceiptEntryActivity extends Activity {
 					
 					rotatePhoto();
 					
-			
-					
-					/*BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-					bitmapOptions.inSampleSize = 6;
-					Bitmap photo = BitmapFactory.decodeFile(_path, bitmapOptions);
-					
-//					Bitmap photo = CameraUtil.decodeFile(getApplicationContext(), _path);
-					ExifInterface exif = new ExifInterface(_path);
-					Log.d("Rotation Tag", "This" + exif.getAttribute(ExifInterface.TAG_ORIENTATION));
-					if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("6")){
-						photo = rotate(photo, 90);
-					}else if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("8")){
-						photo = rotate(photo, 270);
-					}else if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("3")){
-						photo = rotate(photo, 180);
-					} else {
-						photo = rotate(photo, 90);
-					}
-					
-					ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
-					photo.compress(CompressFormat.PNG, 0, outputStream);
-					mImage = outputStream.toByteArray();										
-					photo.recycle();
-					//mImage = getBitmapAsByteArray(photo);
-					if(mImage == null)
-						showErrorMessage("Error", "Decoding Bitmap Error.");*/
-					
 				}catch(Exception e){
 					showErrorMessage("Error", "Decoding Bitmap Error.");				
 				}
@@ -463,8 +379,6 @@ public class ReceiptEntryActivity extends Activity {
 					if (ocrAmount.startsWith("$")) {
 						ocrAmount = ocrAmount.substring(1, ocrAmount.length());
 					}
-//					ocrAmount.replaceAll("[^0-9]+", " ");
-//					ocrAmount.trim();
 					ocrDesc = extras.getString("ocr-desc");
 					loadForm();
 				}catch(Exception ex){
@@ -473,7 +387,6 @@ public class ReceiptEntryActivity extends Activity {
 			}
 			break;
 		}
-
 	}
 	
 	/**
@@ -504,8 +417,6 @@ public class ReceiptEntryActivity extends Activity {
 			} else {
 				cloudStore();
 			}
-			//dropbox.getApi().getSession().startAuthentication(ReceiptEntryActivity.this);
-			//onSaveButtonClick();
 		}
 		
 	}
@@ -525,7 +436,6 @@ public class ReceiptEntryActivity extends Activity {
 	    Bitmap result = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap .getWidth(), scaledBitmap .getHeight(), mtx, true);
 	    Log.v("map", "b" + result.getWidth() + result.getHeight());
 	    return result;
-//	    return Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, true);
 	}
 
 	private void launchSelection() {
@@ -541,62 +451,6 @@ public class ReceiptEntryActivity extends Activity {
 		}
 	}
 
-	/*private byte[] getBitmapAsByteArray(Bitmap bitmap) { 
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
-		bitmap.compress(CompressFormat.PNG, 0, outputStream);
-		byte[] result = outputStream.toByteArray();		
-		return result; 
-	} 
-
-	private void captureImage() {
-		setContentView(R.layout.camera);
-		preview = new Preview(this);
-		FrameLayout layout = ((FrameLayout) findViewById(R.id.preview));
-		layout.addView(preview);
-
-		Button buttonCapture = (Button) findViewById(R.id.button_capture);
-		buttonCapture.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				preview.camera.takePicture(shutterCallback, rawCallback,
-						jpegCallback);
-				loadForm();
-			}
-		});
-
-		Button buttonCancel = (Button) findViewById(R.id.button_cancel);
-		buttonCancel.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				loadForm();
-			}
-		});
-	}
-
-	ShutterCallback shutterCallback = new ShutterCallback() {
-		public void onShutter() {
-		}
-	};
-
-	PictureCallback rawCallback = new PictureCallback() {
-		public void onPictureTaken(byte[] data, Camera camera) {
-		}
-	};
-
-	PictureCallback jpegCallback = new PictureCallback() {
-		public void onPictureTaken(byte[] data, Camera camera) {
-			FileOutputStream outStream = null;
-			try {
-				outStream = ReceiptEntryActivity.this.openFileOutput(String.format("%d.jpg",
-				System.currentTimeMillis()), 0);
-				outStream.write(data);
-				outStream.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-			}
-		}
-	};*/
 
 	private void loadForm() {
 		setContentView(R.layout.receipt_entry);
@@ -722,25 +576,6 @@ public class ReceiptEntryActivity extends Activity {
 			finish();
 			//rotatePhoto();
 		}
-	}
-
-	/*private void populateFields() {
-		if (mRowId != null) {
-			Cursor receipt = mDbHelper.fetchReceipt(mRowId);
-			startManagingCursor(receipt);
-			mDescriptionText.setText(receipt.getString(receipt.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_DESCRIPTION)));
-			mAmountText.setText(receipt.getString(receipt.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_AMOUNT)));
-			mDateText.setText(receipt.getString(receipt.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_DATE)));
-			//Populate spinner with selection in DB
-			//Populate radio button with selection in DB
-		}
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		saveState();
-		outState.putSerializable(ReceiptDbAdapter.KEY_ROWID, mRowId);
 	}
 
 	 /** Finds the proper location on the SD card where we can save files. */
@@ -888,7 +723,6 @@ public class ReceiptEntryActivity extends Activity {
 			e.printStackTrace();
 		}
 		
-		// commented out by charles 11.21
 		if (cloudStorage) {
 			upload = new SyncToDropbox(ReceiptEntryActivity.this, mApi, "/", file);
 			upload.execute();
