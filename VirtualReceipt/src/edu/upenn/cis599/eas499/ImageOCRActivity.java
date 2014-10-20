@@ -41,13 +41,12 @@ public class ImageOCRActivity extends Activity {
 	private static final String WHITELIST = "!?@#$%&*()<>_-+=/.,:;'\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	
 	private static int MODE;
-
 	public static final String lang = "eng";
 	public static final String DATA_PATH = Environment
 			.getExternalStorageDirectory().toString() + "/VirtualReceipt/";
 	public static final String _path = DATA_PATH + "ocr.jpg";
 
-	private Bitmap	mBitmap;
+	private Bitmap mBitmap;
 	private MyView mView;
 	private boolean doneClicked = false;
 	private TessBaseAPI baseApi;
@@ -62,7 +61,6 @@ public class ImageOCRActivity extends Activity {
 		if(baseApi == null){
 			baseApi = new TessBaseAPI();
 			baseApi.setDebug(true);
-			//baseApi.setPageSegMode(TessBaseAPI.AVS_MOST_ACCURATE);
 			baseApi.init(DATA_PATH, lang);
 		}
 		
@@ -70,6 +68,7 @@ public class ImageOCRActivity extends Activity {
 		
 		String[] paths = new String[] { DATA_PATH, DATA_PATH + "tessdata/" };
 		for (String path : paths) {
+			Log.v(TAG, "path is " + path);
 			File dir = new File(path);
 			if (!dir.exists()) {
 				if (!dir.mkdirs()) {
