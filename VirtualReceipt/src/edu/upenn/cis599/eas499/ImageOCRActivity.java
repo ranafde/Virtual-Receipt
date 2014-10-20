@@ -68,7 +68,6 @@ public class ImageOCRActivity extends Activity {
 		
 		String[] paths = new String[] { DATA_PATH, DATA_PATH + "tessdata/" };
 		for (String path : paths) {
-			Log.v(TAG, "path is " + path);
 			File dir = new File(path);
 			if (!dir.exists()) {
 				if (!dir.mkdirs()) {
@@ -81,7 +80,6 @@ public class ImageOCRActivity extends Activity {
 		}
 		if (!(new File(DATA_PATH + "tessdata/" + lang + ".traineddata")).exists()) {
 			try {
-
 				AssetManager assetManager = getAssets();
 				InputStream in = assetManager.open("tessdata/eng.traineddata");
 				OutputStream out = new FileOutputStream(DATA_PATH
