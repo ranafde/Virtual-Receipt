@@ -28,24 +28,24 @@ public class PieChartBuilder extends Activity {
 	private static int[] COLORS = new int[] { Color.GREEN, Color.BLUE,
 			Color.MAGENTA, Color.CYAN };
 
-	private CategorySeries mSeries = new CategorySeries("");
+	private CategorySeries mCategorySeries = new CategorySeries("");
 
-	private DefaultRenderer mRenderer = new DefaultRenderer();
+	private DefaultRenderer mDefaultRenderer = new DefaultRenderer();
 
 	private String mDateFormat;
 
 	/* meaningless variable names */
-	private Button mAdd;
+	private Button mAddButton;
 
-	private EditText mX;
+	private EditText mEditTextX;
 
 	private GraphicalView mChartView;
 
 	@Override
 	protected void onRestoreInstanceState(Bundle savedState) {
 		super.onRestoreInstanceState(savedState);
-		mSeries = (CategorySeries) savedState.getSerializable("current_series");
-		mRenderer = (DefaultRenderer) savedState
+		mCategorySeries = (CategorySeries) savedState.getSerializable("current_series");
+		mDefaultRenderer = (DefaultRenderer) savedState
 				.getSerializable("current_renderer");
 		mDateFormat = savedState.getString("date_format");
 	}
@@ -53,107 +53,68 @@ public class PieChartBuilder extends Activity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putSerializable("current_series", mSeries);
-		outState.putSerializable("current_renderer", mRenderer);
+		outState.putSerializable("current_series", mCategorySeries);
+		outState.putSerializable("current_renderer", mDefaultRenderer);
 		outState.putString("date_format", mDateFormat);
 	}
 
-	/* long method */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.xy_chart);
-		mX = (EditText) findViewById(R.id.xValue);
-		/* set the mRender object in another function and return the values */
-		mRenderer.setApplyBackgroundColor(true);
-		mRenderer.setBackgroundColor(Color.argb(100, 50, 50, 50));
-		mRenderer.setChartTitleTextSize(15);
-		mRenderer.setLabelsTextSize(10);
-		mRenderer.setLegendTextSize(10);
-		mRenderer.setMargins(new int[] { 20, 30, 15, 0 });
-		mRenderer.setZoomButtonsVisible(true);
-		mRenderer.setStartAngle(90);
+		mEditTextX = (EditText) findViewById(R.id.xValue);
+		setDefaultRenderer(mDefaultRenderer);
+		mAddButton = (Button) findViewById(R.id.add);
+		setButton();
+	}
 
-		mAdd = (Button) findViewById(R.id.add);
-		mAdd.setEnabled(true);
-		mX.setEnabled(true);
+	private void setDefaultRenderer(DefaultRenderer mDefaultRenderer){
+		mDefaultRenderer.setApplyBackgroundColor(true);
+		mDefaultRenderer.setBackgroundColor(Color.argb(100, 50, 50, 50));
+		mDefaultRenderer.setChartTitleTextSize(15);
+		mDefaultRenderer.setLabelsTextSize(10);
+		mDefaultRenderer.setLegendTextSize(10);
+		mDefaultRenderer.setMargins(new int[] { 20, 30, 15, 0 });
+		mDefaultRenderer.setZoomButtonsVisible(true);
+		mDefaultRenderer.setStartAngle(90);
+	}
+	
+	private void setButton(){
+		mAddButton.setEnabled(true);
+		mEditTextX.setEnabled(true);
 
-		mAdd.setOnClickListener(new View.OnClickListener() {
+		mAddButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				double x = 0;
 				try {
-					x = Double.parseDouble(mX.getText().toString());
+					x = Double.parseDouble(mEditTextX.getText().toString());
 				} catch (NumberFormatException e) {
 					// TODO
-					mX.requestFocus();
+					mEditTextX.requestFocus();
 					return;
 				}
-				mSeries.add("Series " + (mSeries.getItemCount() + 1), x);
+				mCategorySeries.add("Series " + (mCategorySeries.getItemCount() + 1), x);
 				SimpleSeriesRenderer renderer = new SimpleSeriesRenderer();
-				renderer.setColor(COLORS[(mSeries.getItemCount() - 1)
+				renderer.setColor(COLORS[(mCategorySeries.getItemCount() - 1)
 						% COLORS.length]);
-				mRenderer.addSeriesRenderer(renderer);
-				mX.setText("");
-				mX.requestFocus();
+				mDefaultRenderer.addSeriesRenderer(renderer);
+				mEditTextX.setText("");
+				mEditTextX.requestFocus();
 				if (mChartView != null) {
 					mChartView.repaint();
 				}
 			}
 		});
 	}
-
 	@Override
 	protected void onResume() {
 		super.onResume();
 		if (mChartView == null) {
 			LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
-			mChartView = ChartFactory.getPieChartView(this, mSeries, mRenderer);
-			mRenderer.setClickEnabled(true);
-			mRenderer.setSelectableBuffer(10);
-			// mChartView.setOnClickListener(new View.OnClickListener() {
-			// @Override
-			// public void onClick(View v) {
-			// SeriesSelection seriesSelection =
-			// mChartView.getCurrentSeriesAndPoint();
-			// if (seriesSelection == null) {
-			// Toast
-			// .makeText(PieChartBuilder.this, "No chart element was clicked",
-			// Toast.LENGTH_SHORT)
-			// .show();
-			// } else {
-			// Toast.makeText(
-			// PieChartBuilder.this,
-			// "Chart element data point index " +
-			// seriesSelection.getPointIndex()
-			// + " was clicked" + " point value=" + seriesSelection.getValue(),
-			// Toast.LENGTH_SHORT).show();
-			// }
-			// }
-			// });
-			// mChartView.setOnLongClickListener(new View.OnLongClickListener()
-			// {
-			// @Override
-			// public boolean onLongClick(View v) {
-			// SeriesSelection seriesSelection =
-			// mChartView.getCurrentSeriesAndPoint();
-			// if (seriesSelection == null) {
-			// Toast.makeText(PieChartBuilder.this,
-			// "No chart element was long pressed",
-			// Toast.LENGTH_SHORT);
-			// return false; // no chart element was long pressed, so let
-			// something
-			// // else handle the event
-			// } else {
-			// Toast.makeText(PieChartBuilder.this,
-			// "Chart element data point index "
-			// + seriesSelection.getPointIndex() + " was long pressed",
-			// Toast.LENGTH_SHORT);
-			// return true; // the element was long pressed - the event has been
-			// // handled
-			// }
-			// }
-			// });
+			mChartView = ChartFactory.getPieChartView(this, mCategorySeries, mDefaultRenderer);
+			mDefaultRenderer.setClickEnabled(true);
+			mDefaultRenderer.setSelectableBuffer(10);
 			layout.addView(mChartView, new LayoutParams(
 					LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		} else {
