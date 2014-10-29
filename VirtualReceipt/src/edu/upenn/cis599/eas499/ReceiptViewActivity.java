@@ -7,8 +7,6 @@ package edu.upenn.cis599.eas499;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.Entry;
@@ -23,7 +21,6 @@ import com.dropbox.client2.session.Session.AccessType;
 import edu.upenn.cis599.FinishListener;
 import edu.upenn.cis599.R;
 import edu.upenn.cis599.R.id;
-import edu.upenn.cis599.R.layout;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -39,10 +36,8 @@ import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 

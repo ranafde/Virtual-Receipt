@@ -138,15 +138,14 @@ public class ReceiptEntryActivity extends Activity {
 		if(categoryList == null){
 			categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
 		}
-		Log.d(ACTIVITY_SERVICE, "Entering ReceiptEntryActivity");
+		Log.v(TAG, "Entering ReceiptEntryActivity");
 
 		mDbHelper = new ReceiptDbAdapter(this);
 		mDbHelper.open();
 
 		// Setting up Tesseract
 		if(_path == null && trainData == null)
-			initialize();
-		
+			initialize();		
 		
 		// Prompt for adding an image of receipt
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -296,9 +295,9 @@ public class ReceiptEntryActivity extends Activity {
 		// added by charles
 		Display display = getWindowManager().getDefaultDisplay(); 
 		int width = display.getWidth();
-		int height = display.getHeight() * 8 / 10;
+		int height = display.getHeight();
 
-		photo = Bitmap.createScaledBitmap(photo, height, width, true);
+		photo = Bitmap.createScaledBitmap(photo, width, height, true);
 		
 //		Bitmap photo = CameraUtil.decodeFile(getApplicationContext(), _path);
 		ExifInterface exif = null;
@@ -308,7 +307,7 @@ public class ReceiptEntryActivity extends Activity {
 			e.printStackTrace();
 		}
 		if (exif != null) {
-			Log.d("Rotation Tag", "This" + exif.getAttribute(ExifInterface.TAG_ORIENTATION));
+			Log.e(TAG, "This" + exif.getAttribute(ExifInterface.TAG_ORIENTATION));
 			if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("6")){
 				photo = rotate(photo, 90);
 			}else if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("8")){
@@ -316,6 +315,7 @@ public class ReceiptEntryActivity extends Activity {
 			}else if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("3")){
 				photo = rotate(photo, 180);
 			} else {
+				Log.e(TAG, "Rotating second 90");
 				photo = rotate(photo, 90);
 			}
 			
@@ -323,6 +323,9 @@ public class ReceiptEntryActivity extends Activity {
 			photo.compress(CompressFormat.PNG, 0, outputStream);
 			mImage = outputStream.toByteArray();										
 			photo.recycle();
+		}
+		else{
+			Log.e(TAG, "EXIF not found");
 		}
 	}
 	
@@ -339,28 +342,29 @@ public class ReceiptEntryActivity extends Activity {
 				//Bitmap photo = (Bitmap) data.getExtras().get("data");
 				Log.v(TAG, "Photo accepted. Converting to bitmap.");
 				try{
-					ContentResolver content = getContentResolver();
-					int rotation =-1;
-					long fileSize = new File(_path).length();
-
-					Cursor mediaCursor = content.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, 
-							new String[] {MediaStore.Images.ImageColumns.ORIENTATION, 
-							MediaStore.MediaColumns.SIZE }, MediaStore.MediaColumns.DATE_ADDED + ">=?", 
-							new String[]{String.valueOf(captureTime/1000 - 1)}, 
-							MediaStore.MediaColumns.DATE_ADDED + " desc");
-
-					if (mediaCursor != null && captureTime != 0 && mediaCursor.getCount() !=0 ) {
-						while(mediaCursor.moveToNext()){
-							long size = mediaCursor.getLong(1);
-							//Extra check to make sure that we are getting the orientation from the proper file
-							if(size == fileSize){
-								Log.e(TAG, "Actually there is a file!");
-								rotation = mediaCursor.getInt(0);
-								break;
-		            		}
-			        	} 
-					}
-					Log.e(TAG, "The final rotation is " + rotation);
+//					ContentResolver content = getContentResolver();
+//					int rotation =-1;
+//					long fileSize = new File(_path).length();
+//
+//					Cursor mediaCursor = content.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, 
+//							new String[] {MediaStore.Images.ImageColumns.ORIENTATION, 
+//							MediaStore.MediaColumns.SIZE}, MediaStore.MediaColumns.DATE_ADDED + ">=?", 
+//							new String[]{String.valueOf(captureTime/1000 - 1)}, 
+//							MediaStore.MediaColumns.DATE_ADDED + " desc");
+//					if (mediaCursor != null && captureTime != 0 && mediaCursor.getCount() !=0 ) {
+//						Log.e(TAG, "Entered If");
+//						while(mediaCursor.moveToNext()){
+//							long size = mediaCursor.getLong(1);
+//							//Extra check to make sure that we are getting the orientation from the proper file
+//							//if(size == fileSize){
+//								//Log.e(TAG, "Actually there is a file!");
+//								Log.e(TAG, "Inside While");
+//								rotation = mediaCursor.getInt(0);
+//								break;
+//		            		//}
+//			        	} 
+//					}
+//					Log.e(TAG, "The final rotation is " + rotation);
 					
 					rotatePhoto();
 					

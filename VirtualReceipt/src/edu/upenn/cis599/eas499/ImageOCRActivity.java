@@ -102,7 +102,8 @@ public class ImageOCRActivity extends Activity {
 		Bundle extras = getIntent().getExtras();
 		MODE = extras.getInt("mode");
 		byte[] imageByteArray = null;
-		
+		/* MODE = 0, ImageOCR is launched from ReceiptEntryActivity */
+		/* MODE = 1, ImageOCR is launched from ReceiptViewActivity */
 		if(MODE == 0){
 			Log.v(TAG, "Photo accepted. Converting to bitmap.");
 			try{
@@ -136,7 +137,7 @@ public class ImageOCRActivity extends Activity {
 			mBitmap = imageBitmap.copy(Bitmap.Config.ARGB_8888, true);
 			if (mBitmap.getWidth() > mBitmap.getHeight()) {
 				Matrix m = new Matrix();
-				//m.postRotate(90); /* Rotation shold not be done on image height. We have to check camera orientation. To be fixed next week */
+				m.postRotate(90); /* Rotation shold not be done on image height. We have to check camera orientation. To be fixed next week */
 				mBitmap = Bitmap.createBitmap(mBitmap , 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), m, true)
 								.copy(Bitmap.Config.ARGB_8888, true);
 			}
