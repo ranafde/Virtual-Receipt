@@ -126,6 +126,7 @@ public class ReceiptEntryActivity extends Activity {
     private boolean linking = false;
 
     private SyncToDropbox upload = null;
+	protected long captureTime;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -139,18 +140,18 @@ public class ReceiptEntryActivity extends Activity {
 		}
 		
 		/* Open Database connection */
-		//mDbHelper = new ReceiptDbAdapter(this);
-		//mDbHelper.open();
+		mDbHelper = new ReceiptDbAdapter(this);
+		mDbHelper.open();
 		
 
-<<<<<<< HEAD
+
 		// added by charles 11.20
 		//AndroidAuthSession session = buildSession();
         //mApi = new DropboxAPI<AndroidAuthSession>(session);
         //checkAppKeySetup();
 		
-=======
-			@Override
+
+		/*	@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 				//Go to Camera and take picture to store in db
 				try{
@@ -168,7 +169,7 @@ public class ReceiptEntryActivity extends Activity {
 			}
 		});
 		alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
->>>>>>> 64a5c3309a2f54d6de2be50ccfe05b2950085172
+>>>>>>> 64a5c3309a2f54d6de2be50ccfe05b2950085172*/
 
 		if(value.equals("Yes")){
 			Log.d(ACTIVITY_SERVICE, "Entering ReceiptEntryActivity. Income. Loading form");
@@ -185,8 +186,8 @@ public class ReceiptEntryActivity extends Activity {
 			}
 			Log.v(TAG, "Entering ReceiptEntryActivity");
 	
-			mDbHelper = new ReceiptDbAdapter(this);
-			mDbHelper.open();
+			//mDbHelper = new ReceiptDbAdapter(this);
+			//mDbHelper.open();
 	
 			// Setting up Tesseract
 			if(_path == null && trainData == null)
@@ -223,7 +224,9 @@ public class ReceiptEntryActivity extends Activity {
 	
 				@Override
 				public void onClick(DialogInterface dialog, int whichButton) {
+					Log.d(TAG, "loading form for adding receipts");
 					loadForm();
+					Log.d(TAG, "DONE loading form for adding receipts !!!");
 				}
 			});
 			alert.show();	
@@ -484,12 +487,8 @@ public class ReceiptEntryActivity extends Activity {
 		mAmountText.setText(ocrAmount);
 		mDateText = (EditText) findViewById(id.date);
 		mPayment = (RadioGroup) findViewById(id.payment);
-<<<<<<< HEAD
 		Log.d(TAG,"form display");
-=======
 		mRecurring = (CheckBox) findViewById(id.check_recurring);
-		
->>>>>>> 64a5c3309a2f54d6de2be50ccfe05b2950085172
 		//added by charles 11/18
 		mSave = (Button) findViewById(id.save);
 		mSave.setOnClickListener(new View.OnClickListener(){
@@ -509,9 +508,9 @@ public class ReceiptEntryActivity extends Activity {
 			}
 		});
 
-		Log.d(TAG,"form display");
-		populateSpinner();
-
+		Log.d(TAG,"done form display");
+		//populateSpinner();
+		Log.d(TAG,"laod form- populating spinner");
 		//Set Date
 		mDateText.setOnClickListener(new View.OnClickListener() {
 
@@ -527,7 +526,9 @@ public class ReceiptEntryActivity extends Activity {
 		mDay = cal.get(Calendar.DAY_OF_MONTH);
 		mDate = cal.getTime();
 		mDateText.setText(new SimpleDateFormat("MM/dd/yy").format(mDate).toString());
+		Log.d(TAG,"laod form- going to use mDbHelper");
 		setPaymentMethod(mDbHelper.getMostlyUsedPayment());
+		Log.d(TAG,"laod form- used mDbHelper with success");
 	}
 
 	private void populateSpinner() {
