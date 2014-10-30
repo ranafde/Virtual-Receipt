@@ -52,6 +52,7 @@ public class ReceiptDbAdapter {
     public static final String KEY_DATE = "date";
     public static final String KEY_CATEGORY = "category";
     public static final String KEY_PAYMENT = "payment";
+    public static final String KEY_RECURRING = "recurring";
     public static final String KEY_IMAGE = "image";
     
     // added by charles 11.20
@@ -71,7 +72,7 @@ public class ReceiptDbAdapter {
     
     // added by charles 11.20
     private static final String DATABASE_CREATE_RECEIPT = "create table receipt (_id integer primary key autoincrement, " +
-        	"description text not null, amount real not null, date text not null, category text not null, payment integer not null, image blob, flag integer not null);";
+        	"description text not null, amount real not null, date text not null, category text not null, payment integer not null, recurring boolean not null, image blob, flag integer not null);";
 
     private static final String DATABASE_NAME = "data";
     private static final String DATABASE_TABLE_RECEIPT = "receipt";
@@ -133,13 +134,14 @@ public class ReceiptDbAdapter {
      * @return rowId or -1 if failed
      */
     @SuppressLint("SimpleDateFormat")
-	public long createReceipt(String description, double amount, Date date, String category, int payment, byte[] image, boolean flag) {
+	public long createReceipt(String description, double amount, Date date, String category, int payment, boolean recurring, byte[] image, boolean flag) {
     	ContentValues initialValues = new ContentValues();
     	initialValues.put(KEY_DESCRIPTION, description);
     	initialValues.put(KEY_AMOUNT, amount);
     	initialValues.put(KEY_DATE, new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(date));
     	initialValues.put(KEY_CATEGORY, category);
     	initialValues.put(KEY_PAYMENT, payment);
+    	initialValues.put(KEY_RECURRING, recurring);
     	initialValues.put(KEY_IMAGE, image);
     	
     	//added by charles 11.20
@@ -166,7 +168,7 @@ public class ReceiptDbAdapter {
     public Cursor fetchAllReceipts() {
     	// commented out by charles 11.20
     	//return mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, null, null, null, null, null);
-    	return mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE, KEY_FLAG}, null, null, null, null, null);
+    	return mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_RECURRING, KEY_IMAGE, KEY_FLAG}, null, null, null, null, null);
     }
     
     /**
@@ -177,7 +179,7 @@ public class ReceiptDbAdapter {
      * @throws SQLException if note could not be found/retreived
      */
     public Cursor fetchReceipt(long rowId) throws SQLException {
-    	Cursor mCursor = mDb.rawQuery("select _id, description, amount, strftime(\'%m-%d-%Y\', date) date, category, payment, image, flag from Receipt where _id = \'" + rowId + "'", null);
+    	Cursor mCursor = mDb.rawQuery("select _id, description, amount, strftime(\'%m-%d-%Y\', date) date, category, payment, recurring, image, flag from Receipt where _id = \'" + rowId + "'", null);
     	//Cursor mCursor = mDb.query(true, DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, KEY_ROWID + "=" + rowId, null, null, null, null, null);
     	if (mCursor != null) {
     		mCursor.moveToFirst();
@@ -202,13 +204,14 @@ public class ReceiptDbAdapter {
      * @param name value to set receipt name to
      * @return true if the receipt was successfully updated, false otherwise
      */
-    public boolean updateReceipt(long rowId, String description, double amount, Date date, String category, int payment, byte[] image, boolean flag) {
+    public boolean updateReceipt(long rowId, String description, double amount, Date date, String category, int payment, boolean recurring, byte[] image, boolean flag) {
     	ContentValues args = new ContentValues();
     	args.put(KEY_DESCRIPTION, description);
     	args.put(KEY_AMOUNT, amount);
     	args.put(KEY_DATE, new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(date));
     	args.put(KEY_CATEGORY, category);
     	args.put(KEY_PAYMENT, payment);
+    	args.put(KEY_RECURRING, recurring);
     	args.put(KEY_IMAGE, image);
     	// added by charles 11.20
     	args.put(KEY_FLAG, flag ? 1 : 0);
@@ -387,7 +390,7 @@ public class ReceiptDbAdapter {
 	 * update the database entries so that only the entries with date on current month can preserve its blob data, otherwise that data type is deleted from that entry
 	 */
 	public void updateBlobFields(){
-		Cursor c = mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, null, null, null, null, null);
+		Cursor c = mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_RECURRING, KEY_IMAGE}, null, null, null, null, null);
 		
 		Calendar cal = Calendar.getInstance();
 		int cYear = cal.get(Calendar.YEAR);
@@ -399,6 +402,7 @@ public class ReceiptDbAdapter {
 		Date date;
 		String category;
 		int payment;
+		boolean recurring;
 		int rowId;
 
 		if (c != null) {
@@ -420,6 +424,7 @@ public class ReceiptDbAdapter {
 							amount = c.getDouble(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_AMOUNT));
 							category = c.getString(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_CATEGORY));
 							payment = c.getInt(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_PAYMENT));
+							recurring = (c.getInt(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_RECURRING)) == 1);
 							rowId = c.getInt(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_ROWID));
 							deleteList.add(rowId);
 							
@@ -428,6 +433,7 @@ public class ReceiptDbAdapter {
 					    	updatedValues.put(KEY_AMOUNT, amount);
 					    	updatedValues.put(KEY_DATE, new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(date));
 					    	updatedValues.put(KEY_CATEGORY, category);
+					    	updatedValues.put(KEY_RECURRING, recurring);
 					    	updatedValues.put(KEY_PAYMENT, payment);
 							
 					    	updateList.add(updatedValues);
@@ -466,7 +472,7 @@ public class ReceiptDbAdapter {
 	 * @throws IllegalArgumentException
 	 */
 	public File writeDataToFile() throws IOException, IllegalArgumentException{
-		Cursor c = mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, null, null, null, null, null);
+		Cursor c = mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_RECURRING, KEY_IMAGE}, null, null, null, null, null);
 		
 		File file = new File(FILE_PATH);
 		 
@@ -492,6 +498,8 @@ public class ReceiptDbAdapter {
 					buffer.append(c.getString(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_CATEGORY)));
 					buffer.append(">>");
 					buffer.append(c.getInt(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_PAYMENT)));
+					buffer.append(">>");
+					buffer.append(c.getInt(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_RECURRING)));
 					buffer.append("\n");
 					
 					bw.write(buffer.toString());
@@ -515,7 +523,7 @@ public class ReceiptDbAdapter {
 	public ArrayList<File> writeDataToFiles() throws IOException, IllegalArgumentException{
 		ArrayList<File> result = new ArrayList<File>();
 		
-		Cursor c = mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, null, null, null, null, null);
+		Cursor c = mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_RECURRING, KEY_IMAGE}, null, null, null, null, null);
 		
 		File dataFile = writeDataToFile();
 		result.add(dataFile);
@@ -553,7 +561,7 @@ public class ReceiptDbAdapter {
 	 * @throws IllegalArgumentException
 	 */
 	public int[] syncDatabaseFromFile() throws IOException, IllegalArgumentException, FileNotFoundException, IllegalStateException,  NoSuchElementException, InputMismatchException{
-		Cursor c = mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, null, null, null, null, null);
+		Cursor c = mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_RECURRING, KEY_IMAGE}, null, null, null, null, null);
 		
 		int[] result = new int[2];
 		result[0] = 0; //initialize 0 entries to be inserted
@@ -575,6 +583,8 @@ public class ReceiptDbAdapter {
 					buffer.append(c.getString(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_CATEGORY)));
 					buffer.append(">>");
 					buffer.append(c.getInt(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_PAYMENT)));
+					buffer.append(">>");
+					buffer.append(c.getInt(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_RECURRING)));
 					buffer.append("\n");
 					
 					int curRowId = c.getInt(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_ROWID));
@@ -640,6 +650,7 @@ public class ReceiptDbAdapter {
 		
 		String category = fi.next();
 		int payment = (fi.hasNextInt()) ?fi.nextInt() : 0;
+		boolean recurring = fi.nextInt()==1;
 		
 		fi.close();		
 		
@@ -649,6 +660,7 @@ public class ReceiptDbAdapter {
     	updatedValues.put(KEY_DATE, date);
     	updatedValues.put(KEY_CATEGORY, category);
     	updatedValues.put(KEY_PAYMENT, payment);
+    	updatedValues.put(KEY_RECURRING, recurring);
     	
     	
     	StringBuffer buffer = new StringBuffer();
@@ -662,6 +674,8 @@ public class ReceiptDbAdapter {
 		buffer.append(category);
 		buffer.append(" ");
 		buffer.append(payment);
+		buffer.append(" ");
+		buffer.append(recurring);
 		buffer.append("\n");
     	mDb.insert(DATABASE_TABLE_RECEIPT, null, updatedValues);		
     	Log.v("Inserted new entry", buffer.toString());

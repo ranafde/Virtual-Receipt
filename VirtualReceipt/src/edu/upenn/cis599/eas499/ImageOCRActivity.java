@@ -45,6 +45,7 @@ public class ImageOCRActivity extends Activity {
 	public static final String DATA_PATH = Environment
 			.getExternalStorageDirectory().toString() + "/VirtualReceipt/";
 	public static final String _path = DATA_PATH + "ocr.jpg";
+	public static final String _viewpath = DATA_PATH + "viewImg.jpg";
 
 	private Bitmap mBitmap;
 	private MyView mView;
@@ -106,40 +107,38 @@ public class ImageOCRActivity extends Activity {
 		byte[] imageByteArray = null;
 		/* MODE = 0, ImageOCR is launched from ReceiptEntryActivity */
 		/* MODE = 1, ImageOCR is launched from ReceiptViewActivity */
+		String imageFromPath;
+		
 		if(MODE == 0){
-			Log.v(TAG, "Photo accepted. Converting to bitmap.");
-			try{
-				BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-						
-				bitmapOptions.inSampleSize = 1;
-				Bitmap photo = BitmapFactory.decodeFile(_path, bitmapOptions);
-				
-				// added by charles, scale the bitmap to screen size
-				Display display = getWindowManager().getDefaultDisplay(); 
-				int width = display.getWidth();
-				int height = display.getHeight();
-				
-				/* position of heigt and width in function call was incorrect */
-				photo = Bitmap.createScaledBitmap(photo, width, height, true); 
-				
-				ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
-				photo.compress(CompressFormat.PNG, 0, outputStream);
-				photo.recycle();
-				imageByteArray = outputStream.toByteArray();
-				
-			}catch(Exception e){
-				Log.e(TAG, "Decoding Error");
-			}
-		}else{
-			imageByteArray = extras.getByteArray("image");
+			imageFromPath = _path;
 		}
+		else {
+			imageFromPath = _viewpath;
+		}
+		
+		BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+		
+		bitmapOptions.inSampleSize = 1;
+		Bitmap photo = BitmapFactory.decodeFile(imageFromPath, bitmapOptions);
+		
+		// added by charles, scale the bitmap to screen size
+		Display display = getWindowManager().getDefaultDisplay(); 
+		int width = display.getWidth();
+		int height = display.getHeight();
+		
+		/* position of heigt and width in function call was incorrect */
+		photo = Bitmap.createScaledBitmap(photo, width, height, true); 
+		
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
+		photo.compress(CompressFormat.PNG, 0, outputStream);
+		photo.recycle();
+		imageByteArray = outputStream.toByteArray();
 		
 		if (imageByteArray != null) {
 			Bitmap imageBitmap = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.length);
 			mBitmap = imageBitmap.copy(Bitmap.Config.ARGB_8888, true);
 			if (mBitmap.getWidth() > mBitmap.getHeight()) {
 				Matrix m = new Matrix();
-				m.postRotate(90); /* Rotation shold not be done on image height. We have to check camera orientation. To be fixed next week */
 				mBitmap = Bitmap.createBitmap(mBitmap , 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), m, true)
 								.copy(Bitmap.Config.ARGB_8888, true);
 			}
@@ -235,6 +234,7 @@ public class ImageOCRActivity extends Activity {
 						String recognizedText = "Amount:" + recognizedAmount + " Desc:" + recognizedDesc;
 						Toast toast = Toast.makeText(this, recognizedText, Toast.LENGTH_LONG);
 						toast.show();
+						finish();
 						break;
 				}
 			}
