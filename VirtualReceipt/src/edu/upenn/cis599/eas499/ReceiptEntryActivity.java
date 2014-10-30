@@ -135,61 +135,90 @@ public class ReceiptEntryActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		isAddClicked = false;
-		/*initialize categoryList as follows*/
-		if(categoryList == null){
-			categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
+		
+		Bundle extras = getIntent().getExtras();
+		String value="No";
+		if (extras != null) {
+		    value = extras.getString("Income");
+		    Log.v(TAG,"Value received from other activity"+value);
 		}
-		Log.v(TAG, "Entering ReceiptEntryActivity");
-
-		mDbHelper = new ReceiptDbAdapter(this);
-		mDbHelper.open();
-
-		// Setting up Tesseract
-		if(_path == null && trainData == null)
-			initialize();		
 		
-		// Prompt for adding an image of receipt
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-		alert.setTitle("Upload a Receipt");
-		alert.setMessage("Would you like to add a receipt image?");
-		alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-				//Go to Camera and take picture to store in db
-				//captureImage();
-				try{
-					isAddClicked = !isAddClicked;
-					if(isAddClicked){		
-						captureTime = System.currentTimeMillis();	
-						Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-						mImageCaptureUri = Uri.fromFile(imageFile);
-						cameraIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-						cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
-						startActivityForResult(cameraIntent, CAMERA_REQUEST);
-					} 
-				} catch (RuntimeException e) {
-					// Barcode Scanner has seen crashes in the wild of this variety:
-					// java.?lang.?RuntimeException: Fail to connect to camera service
-					showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
-			    }
-			}
-		});
-		alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-				loadForm();
-			}
-		});
-		alert.show();
+		/* Open Database connection */
+		//mDbHelper = new ReceiptDbAdapter(this);
+		//mDbHelper.open();
 		
+
 		// added by charles 11.20
-		AndroidAuthSession session = buildSession();
-        mApi = new DropboxAPI<AndroidAuthSession>(session);
-        checkAppKeySetup();
+		//AndroidAuthSession session = buildSession();
+        //mApi = new DropboxAPI<AndroidAuthSession>(session);
+        //checkAppKeySetup();
+		
+
+		if(value.equals("Yes")){
+			Log.d(ACTIVITY_SERVICE, "Entering ReceiptEntryActivity. Income. Loading form");
+			loadForm();
+			Log.d(ACTIVITY_SERVICE, "Done loading form for income");
+		}
+		else{
+			Log.d(ACTIVITY_SERVICE, "Entering ReceiptEntryActivity. Adding receipt");
+			//	addReceipt();
+			isAddClicked = false;
+			/* initialize categoryList as follows */
+			if(categoryList == null){
+				categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
+			}
+			Log.v(TAG, "Entering ReceiptEntryActivity");
+	
+			mDbHelper = new ReceiptDbAdapter(this);
+			mDbHelper.open();
+	
+			// Setting up Tesseract
+			if(_path == null && trainData == null)
+				initialize();		
+			
+			// Prompt for adding an image of receipt
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+			alert.setTitle("Upload a Receipt");
+			alert.setMessage("Would you like to add a receipt image?");
+			alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+	
+				@Override
+				public void onClick(DialogInterface dialog, int whichButton) {
+					//Go to Camera and take picture to store in db
+					//captureImage();
+					try{
+						isAddClicked = !isAddClicked;
+						if(isAddClicked){		
+							captureTime = System.currentTimeMillis();	
+							Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+							mImageCaptureUri = Uri.fromFile(imageFile);
+							cameraIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+							cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
+							startActivityForResult(cameraIntent, CAMERA_REQUEST);
+						} 
+					} catch (RuntimeException e) {
+						// Barcode Scanner has seen crashes in the wild of this variety:
+						// java.?lang.?RuntimeException: Fail to connect to camera service
+						showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
+				    }
+				}
+			});
+			alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+	
+				@Override
+				public void onClick(DialogInterface dialog, int whichButton) {
+					loadForm();
+				}
+			});
+			alert.show();	
+			//added by charles 11.20
+			AndroidAuthSession session = buildSession();
+			mApi = new DropboxAPI<AndroidAuthSession>(session);
+			checkAppKeySetup();
+		}	
 	}
+	
+	
 	
 	// added by charles 11.20
 	private AndroidAuthSession buildSession() {
@@ -459,6 +488,7 @@ public class ReceiptEntryActivity extends Activity {
 
 
 	private void loadForm() {
+		Log.d(TAG,"loading form");
 		setContentView(R.layout.receipt_entry);
 		mDescriptionText = (EditText) findViewById(R.id.description);
 		mDescriptionText.setText(ocrDesc);
@@ -466,7 +496,7 @@ public class ReceiptEntryActivity extends Activity {
 		mAmountText.setText(ocrAmount);
 		mDateText = (EditText) findViewById(id.date);
 		mPayment = (RadioGroup) findViewById(id.payment);
-		
+		Log.d(TAG,"form display");
 		//added by charles 11/18
 		mSave = (Button) findViewById(id.save);
 		mSave.setOnClickListener(new View.OnClickListener(){
@@ -486,6 +516,7 @@ public class ReceiptEntryActivity extends Activity {
 			}
 		});
 
+		Log.d(TAG,"form display");
 		populateSpinner();
 
 		//Set Date

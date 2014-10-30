@@ -82,6 +82,7 @@ int layout receipts_row 0x7f03000c
 int layout statistics_header 0x7f03000d
 int layout xy_chart 0x7f03000e
 int string add 0x7f05002c
+int string add_income 0x7f05002e
 int string add_receipt 0x7f050005
 int string add_values 0x7f050029
 int string amount 0x7f05000b
