@@ -143,34 +143,6 @@ public class ReceiptEntryActivity extends Activity {
 		mDbHelper = new ReceiptDbAdapter(this);
 		mDbHelper.open();
 		
-
-
-		// added by charles 11.20
-		//AndroidAuthSession session = buildSession();
-        //mApi = new DropboxAPI<AndroidAuthSession>(session);
-        //checkAppKeySetup();
-		
-
-		/*	@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-				//Go to Camera and take picture to store in db
-				try{
-					isAddClicked = !isAddClicked;
-					if(isAddClicked){			
-						Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-						mImageCaptureUri = Uri.fromFile(imageFile);
-						cameraIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-						cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
-						startActivityForResult(cameraIntent, CAMERA_REQUEST);
-					} 
-				} catch (RuntimeException e) {
-					showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
-			    }
-			}
-		});
-		alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
->>>>>>> 64a5c3309a2f54d6de2be50ccfe05b2950085172*/
-
 		if(value.equals("Yes")){
 			Log.d(ACTIVITY_SERVICE, "Entering ReceiptEntryActivity. Income. Loading form");
 			loadForm();
@@ -178,16 +150,13 @@ public class ReceiptEntryActivity extends Activity {
 		}
 		else{
 			Log.d(ACTIVITY_SERVICE, "Entering ReceiptEntryActivity. Adding receipt");
-			//	addReceipt();
 			isAddClicked = false;
+			
 			/* initialize categoryList as follows */
 			if(categoryList == null){
 				categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
 			}
 			Log.v(TAG, "Entering ReceiptEntryActivity");
-	
-			//mDbHelper = new ReceiptDbAdapter(this);
-			//mDbHelper.open();
 	
 			// Setting up Tesseract
 			if(_path == null && trainData == null)
