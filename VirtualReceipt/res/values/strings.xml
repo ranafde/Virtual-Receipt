@@ -27,6 +27,7 @@
     <string name="category">Category</string>
     <string name="choose_category">Choose one:</string>
     <string name="payment_method">Payment Method</string>
+    <string name="recurring">Recurring Expense</string>
     <string name="cash">Cash</string>
     <string name="credit">Credit</string>
     <string name="debit">Debit</string>

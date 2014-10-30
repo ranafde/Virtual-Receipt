@@ -59,6 +59,7 @@ import android.view.Display;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -81,6 +82,7 @@ public class ReceiptEntryActivity extends Activity {
 	private EditText mDateText;
 	private Spinner mCategoryText;
 	private RadioGroup mPayment;
+	private CheckBox mRecurring;
 	private Long mRowId;
 	private byte[] mImage;
 
