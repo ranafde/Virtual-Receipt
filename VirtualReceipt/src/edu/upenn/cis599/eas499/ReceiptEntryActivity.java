@@ -36,7 +36,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,7 +43,6 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -59,7 +57,6 @@ import android.view.Display;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -82,7 +79,6 @@ public class ReceiptEntryActivity extends Activity {
 	private EditText mDateText;
 	private Spinner mCategoryText;
 	private RadioGroup mPayment;
-	private CheckBox mRecurring;
 	private Long mRowId;
 	private byte[] mImage;
 
@@ -112,7 +108,6 @@ public class ReceiptEntryActivity extends Activity {
 	public static ArrayList<String> categoryList;
 	
 	private boolean isAddClicked = false;
-	private long captureTime;
 	
 	// added by charles 18/11
 	private boolean cloudStorage = false;
@@ -120,8 +115,6 @@ public class ReceiptEntryActivity extends Activity {
 	
 	// added by charles 11.20
 	DropboxAPI<AndroidAuthSession> mApi;
-	//final static private String APP_KEY = "dc36xrc9680qj3w";
-    //final static private String APP_SECRET = "t7roqse0foysbru";
 	final static private String APP_KEY = "w9bii3r2hidx7jp";
     final static private String APP_SECRET = "uxrrek6sgqf6uv0";
     final static private AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
@@ -158,11 +151,9 @@ public class ReceiptEntryActivity extends Activity {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 				//Go to Camera and take picture to store in db
-				//captureImage();
 				try{
 					isAddClicked = !isAddClicked;
-					if(isAddClicked){		
-						captureTime = System.currentTimeMillis();	
+					if(isAddClicked){			
 						Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 						mImageCaptureUri = Uri.fromFile(imageFile);
 						cameraIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -170,8 +161,6 @@ public class ReceiptEntryActivity extends Activity {
 						startActivityForResult(cameraIntent, CAMERA_REQUEST);
 					} 
 				} catch (RuntimeException e) {
-					// Barcode Scanner has seen crashes in the wild of this variety:
-					// java.?lang.?RuntimeException: Fail to connect to camera service
 					showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
 			    }
 			}
@@ -301,7 +290,6 @@ public class ReceiptEntryActivity extends Activity {
 
 		photo = Bitmap.createScaledBitmap(photo, width, height, true);
 		
-//		Bitmap photo = CameraUtil.decodeFile(getApplicationContext(), _path);
 		ExifInterface exif = null;
 		try {
 			exif = new ExifInterface(_path);
@@ -318,7 +306,7 @@ public class ReceiptEntryActivity extends Activity {
 				photo = rotate(photo, 180);
 			} else {
 				Log.e(TAG, "Rotating second 90");
-				photo = rotate(photo, 90);
+				photo = rotate(photo, 0);
 			}
 			
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
@@ -333,41 +321,14 @@ public class ReceiptEntryActivity extends Activity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){  
-		//super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
 		case CAMERA_REQUEST:
-			//if (requestCode == CAMERA_REQUEST) {
 			if (resultCode == Activity.RESULT_CANCELED) {
 				Log.d(ACTIVITY_SERVICE, "Camera activity cancelled");
 			}
 			else if (resultCode == Activity.RESULT_OK) {
-				//Bitmap photo = (Bitmap) data.getExtras().get("data");
 				Log.v(TAG, "Photo accepted. Converting to bitmap.");
-				try{
-//					ContentResolver content = getContentResolver();
-//					int rotation =-1;
-//					long fileSize = new File(_path).length();
-//
-//					Cursor mediaCursor = content.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, 
-//							new String[] {MediaStore.Images.ImageColumns.ORIENTATION, 
-//							MediaStore.MediaColumns.SIZE}, MediaStore.MediaColumns.DATE_ADDED + ">=?", 
-//							new String[]{String.valueOf(captureTime/1000 - 1)}, 
-//							MediaStore.MediaColumns.DATE_ADDED + " desc");
-//					if (mediaCursor != null && captureTime != 0 && mediaCursor.getCount() !=0 ) {
-//						Log.e(TAG, "Entered If");
-//						while(mediaCursor.moveToNext()){
-//							long size = mediaCursor.getLong(1);
-//							//Extra check to make sure that we are getting the orientation from the proper file
-//							//if(size == fileSize){
-//								//Log.e(TAG, "Actually there is a file!");
-//								Log.e(TAG, "Inside While");
-//								rotation = mediaCursor.getInt(0);
-//								break;
-//		            		//}
-//			        	} 
-//					}
-//					Log.e(TAG, "The final rotation is " + rotation);
-					
+				try{					
 					rotatePhoto();
 					
 				}catch(Exception e){
@@ -520,7 +481,6 @@ public class ReceiptEntryActivity extends Activity {
 		else
 			temp.addAll(sortedList);
 		
-		//temp.addAll(sortedList);
 		for(String category : categoryList){
 			if(categoryList.contains(category) && !temp.contains(category))
 				temp.add(category);
@@ -580,43 +540,9 @@ public class ReceiptEntryActivity extends Activity {
 			saveState(null);
 			setResult(RESULT_OK);
 			finish();
-			//rotatePhoto();
 		}
 	}
 
-	 /** Finds the proper location on the SD card where we can save files. */
-	private File getStorageDirectory() {
-	
-		String state = null;
-		try {
-			state = Environment.getExternalStorageState();
-		} catch (RuntimeException e) {
-			Log.e(TAG, "Is the SD card visible?", e);
-			showErrorMessage("Error", "Required external storage (such as an SD card) is unavailable.");
-		}
-	
-		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-		  
-			try {
-				return getExternalFilesDir(Environment.MEDIA_MOUNTED);
-			} catch (NullPointerException e) {
-				// We get an error here if the SD card is visible, but full
-				Log.e(TAG, "External storage is unavailable");
-				showErrorMessage("Error", "Required external storage (such as an SD card) is full or unavailable.");
-			}
-		
-		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-			// We can only read the media
-			Log.e(TAG, "External storage is read-only");
-			showErrorMessage("Error", "Required external storage (such as an SD card) is unavailable for data storage.");
-		} else {
-			// Something else is wrong. It may be one of many other states, but all we need
-			// to know is we can neither read nor write
-			Log.e(TAG, "External storage is unavailable");
-			showErrorMessage("Error", "Required external storage (such as an SD card) is unavailable or corrupted.");
-	    }
-	    return null;
-	}
 	
 	/**
 	   * Displays an error message dialog box to the user on the UI thread.
