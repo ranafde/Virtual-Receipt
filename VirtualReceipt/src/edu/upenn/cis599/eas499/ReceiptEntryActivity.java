@@ -427,6 +427,7 @@ public class ReceiptEntryActivity extends Activity {
 		mAmountText.setText(ocrAmount);
 		mDateText = (EditText) findViewById(id.date);
 		mPayment = (RadioGroup) findViewById(id.payment);
+		mRecurring = (CheckBox) findViewById(id.check_recurring);
 		
 		//added by charles 11/18
 		mSave = (Button) findViewById(id.save);
@@ -532,6 +533,7 @@ public class ReceiptEntryActivity extends Activity {
 		mDateText.setText("");
 		mCategoryText.setSelection(0);
 		mPayment.clearCheck();
+		mRecurring.setChecked(true);
 	}
 
 	// modified by charles 11/18
@@ -679,6 +681,7 @@ public class ReceiptEntryActivity extends Activity {
 			int payment = getPaymentMethod().getValue();
 			int categoryIndex = mCategoryText.getSelectedItemPosition();
 			String category = (newCat != null) ? newCat : categoryList.get(categoryIndex);	
+			boolean recurring = mRecurring.isChecked();
 			
 			if (mRowId == null) {
 				Log.d(ACTIVITY_SERVICE, "mRowId == null");
@@ -686,11 +689,11 @@ public class ReceiptEntryActivity extends Activity {
 				// added by charles 11/18 11.20
 				long id = 0;
 				if (this.cloudStorage) {
-					id = mDbHelper.createReceipt(description, amount, mDate, category, payment, mImage, this.cloudStorage);
+					id = mDbHelper.createReceipt(description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
 					//Toast.makeText(this, "CloudStorageNew", Toast.LENGTH_SHORT).show();
 					this.cloudStorage = false;
 				} else {
-					id = mDbHelper.createReceipt(description, amount, mDate, category, payment, mImage, this.cloudStorage);
+					id = mDbHelper.createReceipt(description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
 					//Toast.makeText(this, "NoCloudStorageNew", Toast.LENGTH_SHORT).show();
 				}
 				
@@ -704,11 +707,11 @@ public class ReceiptEntryActivity extends Activity {
 				Log.d(ACTIVITY_SERVICE, "mRowId != null");
 				// added by charles 11/18 11.20
 				if (this.cloudStorage) {
-					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, mImage, this.cloudStorage);
+					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, recurring,  mImage, this.cloudStorage);
 					this.cloudStorage = false;
 					Toast.makeText(this, "CloudStorageOld", Toast.LENGTH_SHORT).show();
 				} else {
-					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, mImage, this.cloudStorage);
+					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
 					Toast.makeText(this, "NoCloudStorageOld", Toast.LENGTH_SHORT).show();
 				}
 				
