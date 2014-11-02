@@ -38,16 +38,16 @@ public final class R {
         public static final int statistics=0x7f02000f;
     }
     public static final class id {
-        public static final int add=0x7f08002d;
+        public static final int add=0x7f08002c;
         public static final int all_time=0x7f08000b;
         public static final int amount=0x7f080015;
         public static final int auth_button=0x7f080003;
         public static final int buttonClick=0x7f080010;
-        public static final int button_delete=0x7f080028;
-        public static final int button_view_image=0x7f080027;
+        public static final int button_delete=0x7f080027;
+        public static final int button_view_image=0x7f080026;
         public static final int category=0x7f080017;
         public static final int category_text=0x7f080000;
-        public static final int chart=0x7f08002e;
+        public static final int chart=0x7f08002d;
         public static final int check_recurring=0x7f08001c;
         public static final int clear=0x7f08001e;
         public static final int current_month=0x7f080009;
@@ -64,28 +64,27 @@ public final class R {
         public static final int logged_in_display=0x7f080004;
         public static final int menu=0x7f080012;
         public static final int myview=0x7f08000c;
-        public static final int new_series=0x7f08002f;
+        public static final int new_series=0x7f08002e;
         public static final int payment=0x7f080018;
         public static final int preview=0x7f08000f;
         public static final int radio_cash=0x7f080019;
         public static final int radio_credit=0x7f08001a;
         public static final int radio_debit=0x7f08001b;
         public static final int receiptHeader=0x7f08001f;
-        public static final int receipt_text=0x7f080029;
+        public static final int receipt_text=0x7f080028;
         public static final int reselect=0x7f08000e;
         public static final int save=0x7f08001d;
-        public static final int statisticsHeader=0x7f08002a;
+        public static final int statisticsHeader=0x7f080029;
         public static final int tableLayout1=0x7f080020;
         public static final int tableRow1=0x7f080021;
         public static final int tableRow2=0x7f080022;
         public static final int tableRow3=0x7f080023;
         public static final int tableRow4=0x7f080024;
         public static final int tableRow5=0x7f080025;
-        public static final int tableRow6=0x7f080026;
         public static final int upload_button=0x7f080006;
         public static final int view_flipper=0x7f080008;
-        public static final int xValue=0x7f08002b;
-        public static final int yValue=0x7f08002c;
+        public static final int xValue=0x7f08002a;
+        public static final int yValue=0x7f08002b;
     }
     public static final class layout {
         public static final int categories_row=0x7f030000;
