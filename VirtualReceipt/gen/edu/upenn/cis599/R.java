@@ -105,6 +105,7 @@ public final class R {
     }
     public static final class string {
         public static final int add=0x7f05002c;
+        public static final int add_income=0x7f05002e;
         public static final int add_receipt=0x7f050005;
         public static final int add_values=0x7f050029;
         public static final int amount=0x7f05000b;

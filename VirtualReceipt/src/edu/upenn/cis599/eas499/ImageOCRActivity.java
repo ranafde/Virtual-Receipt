@@ -60,13 +60,15 @@ public class ImageOCRActivity extends Activity {
 		// Setting up Tesseract
 		Log.d(TAG, "setting up Tesseract");
 		if(baseApi == null){
+			Log.d(TAG, "initialized Tesseract");
 			baseApi = new TessBaseAPI();
+			Log.d(TAG, "initialized Tesseract okay!!!");
 			baseApi.setDebug(true);
 			baseApi.init(DATA_PATH, lang);
 		}
 		
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR | ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		
+		Log.d(TAG, "Tesseract set!!!");
 		String[] paths = new String[] { DATA_PATH, DATA_PATH + "tessdata/" };
 		for (String path : paths) {
 			File dir = new File(path);

@@ -31,6 +31,7 @@ public class VirtualReceiptActivity extends Activity {
 	private ReceiptDbAdapter mDbHelper;
 	ListView lv;
 	ArrayList<String> menuArray;
+	private static final String TAG = "VirtualReceiptActivity.java";
 	
 	/** Called when the activity is first created. */
     @Override
@@ -42,6 +43,7 @@ public class VirtualReceiptActivity extends Activity {
         mDbHelper.close();
         
         menuArray = new ArrayList<String>();
+        menuArray.add(getResources().getString(R.string.add_income));
         menuArray.add(getResources().getString(R.string.add_receipt));
         menuArray.add(getResources().getString(R.string.view_receipt));
         menuArray.add(getResources().getString(R.string.spending_stats));
@@ -59,6 +61,8 @@ public class VirtualReceiptActivity extends Activity {
         
         lv.setOnItemClickListener(new MyListener(this));
         header.setClickable(false);
+        
+        Log.d(TAG,"okay so far");
         //
 
         /**
@@ -84,7 +88,14 @@ public class VirtualReceiptActivity extends Activity {
 			TextView txt = (TextView) parent.getChildAt(position - lv.getFirstVisiblePosition()).findViewById(R.id.menu);
             String label = txt.getText().toString();
 			Intent intent;
-    		if (label.equals("Add a receipt")) {
+			Log.d(TAG,"checking labels");
+			if (label.equals("Add Income")) {
+    			intent = new Intent(p, ReceiptEntryActivity.class);
+    			intent.putExtra("Income","Yes");
+    			Log.d(TAG,"add an income virtual receipt activity");
+    			startActivity(intent);
+    		}
+			else if (label.equals("Add a receipt")) {
     			intent = new Intent(p, ReceiptEntryActivity.class);
     			startActivity(intent);
     		}
