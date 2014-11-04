@@ -143,8 +143,16 @@ public class ReceiptEntryActivity extends Activity {
 		mDbHelper = new ReceiptDbAdapter(this);
 		mDbHelper.open();
 		
+		if(categoryList == null){
+			categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
+		}
+		
+		
 		if(value.equals("Yes")){
 			Log.d(ACTIVITY_SERVICE, "Entering ReceiptEntryActivity. Income. Loading form");
+			if(categoryList == null){
+				categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
+			}
 			loadForm();
 			Log.d(ACTIVITY_SERVICE, "Done loading form for income");
 		}
