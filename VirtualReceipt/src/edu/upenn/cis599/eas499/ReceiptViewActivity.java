@@ -50,7 +50,8 @@ public class ReceiptViewActivity extends Activity {
 	private TextView mCategoryText;
 	private TextView mPaymentText;
 	private Long mRowId;
-
+	private TextView mRecurringText;
+	
 	// added by charles 11.21
 	DropboxAPI<AndroidAuthSession> mApi = null;
     final static private String APP_KEY = "w9bii3r2hidx7jp";
@@ -78,7 +79,7 @@ public class ReceiptViewActivity extends Activity {
 		mDateText = (TextView) findViewById(id.date);
 		mCategoryText = (TextView) findViewById(id.category);
 		mPaymentText = (TextView) findViewById(id.payment);
-		
+		mRecurringText = (TextView)findViewById(id.check_recurring);
 		mRowId = (savedInstanceState == null) ? null : (Long) savedInstanceState.getSerializable(ReceiptDbAdapter.KEY_ROWID);
 		if (mRowId == null) {
 			Bundle extras = getIntent().getExtras();
@@ -167,6 +168,7 @@ public class ReceiptViewActivity extends Activity {
 			mPaymentText.setText(PaymentType.get(paymentIntVal).getText());
 			//Pull category text from db.
 			mCategoryText.setText(receipt.getString(receipt.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_CATEGORY)));
+			mRecurringText.setText(receipt.getString(receipt.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_RECURRING)).equals("1")?"Yes":"No");
 			receipt.close();
 			}
 	}

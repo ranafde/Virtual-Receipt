@@ -486,7 +486,7 @@ public class ReceiptEntryActivity extends Activity {
 		});
 
 		Log.d(TAG,"done form display");
-		//populateSpinner();
+		populateSpinner();
 		Log.d(TAG,"laod form- populating spinner");
 		//Set Date
 		mDateText.setOnClickListener(new View.OnClickListener() {

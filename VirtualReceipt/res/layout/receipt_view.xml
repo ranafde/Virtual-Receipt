@@ -114,8 +114,7 @@
     <TableRow
         android:id="@+id/tableRow5"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp" >
+        android:layout_height="wrap_content" >
 
         <TextView
             android:layout_width="wrap_content"
@@ -128,6 +127,30 @@
         
         <TextView
 			android:id="@+id/payment"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="3dip"
+			android:textSize="16sp" />
+
+    </TableRow>
+    
+    <TableRow
+        android:id="@+id/tableRow6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:padding="3dip"
+            android:text="@string/recurring"
+            android:textSize="16sp" />
+        
+        <TextView
+			android:id="@+id/check_recurring"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:padding="3dip"
