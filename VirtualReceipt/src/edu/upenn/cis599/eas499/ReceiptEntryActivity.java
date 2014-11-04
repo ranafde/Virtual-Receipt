@@ -36,7 +36,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,7 +43,6 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -59,6 +57,7 @@ import android.view.Display;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -81,6 +80,7 @@ public class ReceiptEntryActivity extends Activity {
 	private EditText mDateText;
 	private Spinner mCategoryText;
 	private RadioGroup mPayment;
+	private CheckBox mRecurring;
 	private Long mRowId;
 	private byte[] mImage;
 
@@ -110,7 +110,6 @@ public class ReceiptEntryActivity extends Activity {
 	public static ArrayList<String> categoryList;
 	
 	private boolean isAddClicked = false;
-	private long captureTime;
 	
 	// added by charles 18/11
 	private boolean cloudStorage = false;
@@ -118,8 +117,6 @@ public class ReceiptEntryActivity extends Activity {
 	
 	// added by charles 11.20
 	DropboxAPI<AndroidAuthSession> mApi;
-	//final static private String APP_KEY = "dc36xrc9680qj3w";
-    //final static private String APP_SECRET = "t7roqse0foysbru";
 	final static private String APP_KEY = "w9bii3r2hidx7jp";
     final static private String APP_SECRET = "uxrrek6sgqf6uv0";
     final static private AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
@@ -129,65 +126,87 @@ public class ReceiptEntryActivity extends Activity {
     private boolean linking = false;
 
     private SyncToDropbox upload = null;
+	protected long captureTime;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		isAddClicked = false;
-		/*initialize categoryList as follows*/
-		if(categoryList == null){
-			categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
+		
+		Bundle extras = getIntent().getExtras();
+		String value="No";
+		if (extras != null) {
+		    value = extras.getString("Income");
+		    Log.v(TAG,"Value received from other activity"+value);
 		}
-		Log.v(TAG, "Entering ReceiptEntryActivity");
-
+		
+		/* Open Database connection */
 		mDbHelper = new ReceiptDbAdapter(this);
 		mDbHelper.open();
-
-		// Setting up Tesseract
-		if(_path == null && trainData == null)
-			initialize();		
 		
-		// Prompt for adding an image of receipt
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-		alert.setTitle("Upload a Receipt");
-		alert.setMessage("Would you like to add a receipt image?");
-		alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-				//Go to Camera and take picture to store in db
-				//captureImage();
-				try{
-					isAddClicked = !isAddClicked;
-					if(isAddClicked){		
-						captureTime = System.currentTimeMillis();	
-						Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-						mImageCaptureUri = Uri.fromFile(imageFile);
-						cameraIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-						cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
-						startActivityForResult(cameraIntent, CAMERA_REQUEST);
-					} 
-				} catch (RuntimeException e) {
-					// Barcode Scanner has seen crashes in the wild of this variety:
-					// java.?lang.?RuntimeException: Fail to connect to camera service
-					showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
-			    }
+		if(value.equals("Yes")){
+			Log.d(ACTIVITY_SERVICE, "Entering ReceiptEntryActivity. Income. Loading form");
+			loadForm();
+			Log.d(ACTIVITY_SERVICE, "Done loading form for income");
+		}
+		else{
+			Log.d(ACTIVITY_SERVICE, "Entering ReceiptEntryActivity. Adding receipt");
+			isAddClicked = false;
+			
+			/* initialize categoryList as follows */
+			if(categoryList == null){
+				categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
 			}
-		});
-		alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-				loadForm();
-			}
-		});
-		alert.show();
-		
-		// added by charles 11.20
-		AndroidAuthSession session = buildSession();
-        mApi = new DropboxAPI<AndroidAuthSession>(session);
-        checkAppKeySetup();
+			Log.v(TAG, "Entering ReceiptEntryActivity");
+	
+			// Setting up Tesseract
+			if(_path == null && trainData == null)
+				initialize();		
+			
+			// Prompt for adding an image of receipt
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+			alert.setTitle("Upload a Receipt");
+			alert.setMessage("Would you like to add a receipt image?");
+			alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+	
+				@Override
+				public void onClick(DialogInterface dialog, int whichButton) {
+					//Go to Camera and take picture to store in db
+					//captureImage();
+					try{
+						isAddClicked = !isAddClicked;
+						if(isAddClicked){		
+							captureTime = System.currentTimeMillis();	
+							Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+							mImageCaptureUri = Uri.fromFile(imageFile);
+							cameraIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+							cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
+							startActivityForResult(cameraIntent, CAMERA_REQUEST);
+						} 
+					} catch (RuntimeException e) {
+						// Barcode Scanner has seen crashes in the wild of this variety:
+						// java.?lang.?RuntimeException: Fail to connect to camera service
+						showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
+				    }
+				}
+			});
+			alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+	
+				@Override
+				public void onClick(DialogInterface dialog, int whichButton) {
+					Log.d(TAG, "loading form for adding receipts");
+					loadForm();
+					Log.d(TAG, "DONE loading form for adding receipts !!!");
+				}
+			});
+			alert.show();	
+			//added by charles 11.20
+			AndroidAuthSession session = buildSession();
+			mApi = new DropboxAPI<AndroidAuthSession>(session);
+			checkAppKeySetup();
+		}	
 	}
+	
+	
 	
 	// added by charles 11.20
 	private AndroidAuthSession buildSession() {
@@ -299,7 +318,6 @@ public class ReceiptEntryActivity extends Activity {
 
 		photo = Bitmap.createScaledBitmap(photo, width, height, true);
 		
-//		Bitmap photo = CameraUtil.decodeFile(getApplicationContext(), _path);
 		ExifInterface exif = null;
 		try {
 			exif = new ExifInterface(_path);
@@ -316,7 +334,7 @@ public class ReceiptEntryActivity extends Activity {
 				photo = rotate(photo, 180);
 			} else {
 				Log.e(TAG, "Rotating second 90");
-				photo = rotate(photo, 90);
+				photo = rotate(photo, 0);
 			}
 			
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
@@ -331,41 +349,14 @@ public class ReceiptEntryActivity extends Activity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){  
-		//super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
 		case CAMERA_REQUEST:
-			//if (requestCode == CAMERA_REQUEST) {
 			if (resultCode == Activity.RESULT_CANCELED) {
 				Log.d(ACTIVITY_SERVICE, "Camera activity cancelled");
 			}
 			else if (resultCode == Activity.RESULT_OK) {
-				//Bitmap photo = (Bitmap) data.getExtras().get("data");
 				Log.v(TAG, "Photo accepted. Converting to bitmap.");
-				try{
-//					ContentResolver content = getContentResolver();
-//					int rotation =-1;
-//					long fileSize = new File(_path).length();
-//
-//					Cursor mediaCursor = content.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, 
-//							new String[] {MediaStore.Images.ImageColumns.ORIENTATION, 
-//							MediaStore.MediaColumns.SIZE}, MediaStore.MediaColumns.DATE_ADDED + ">=?", 
-//							new String[]{String.valueOf(captureTime/1000 - 1)}, 
-//							MediaStore.MediaColumns.DATE_ADDED + " desc");
-//					if (mediaCursor != null && captureTime != 0 && mediaCursor.getCount() !=0 ) {
-//						Log.e(TAG, "Entered If");
-//						while(mediaCursor.moveToNext()){
-//							long size = mediaCursor.getLong(1);
-//							//Extra check to make sure that we are getting the orientation from the proper file
-//							//if(size == fileSize){
-//								//Log.e(TAG, "Actually there is a file!");
-//								Log.e(TAG, "Inside While");
-//								rotation = mediaCursor.getInt(0);
-//								break;
-//		            		//}
-//			        	} 
-//					}
-//					Log.e(TAG, "The final rotation is " + rotation);
-					
+				try{					
 					rotatePhoto();
 					
 				}catch(Exception e){
@@ -457,6 +448,7 @@ public class ReceiptEntryActivity extends Activity {
 
 
 	private void loadForm() {
+		Log.d(TAG,"loading form");
 		setContentView(R.layout.receipt_entry);
 		mDescriptionText = (EditText) findViewById(R.id.description);
 		mDescriptionText.setText(ocrDesc);
@@ -464,7 +456,8 @@ public class ReceiptEntryActivity extends Activity {
 		mAmountText.setText(ocrAmount);
 		mDateText = (EditText) findViewById(id.date);
 		mPayment = (RadioGroup) findViewById(id.payment);
-		
+		Log.d(TAG,"form display");
+		mRecurring = (CheckBox) findViewById(id.check_recurring);
 		//added by charles 11/18
 		mSave = (Button) findViewById(id.save);
 		mSave.setOnClickListener(new View.OnClickListener(){
@@ -484,8 +477,9 @@ public class ReceiptEntryActivity extends Activity {
 			}
 		});
 
-		populateSpinner();
-
+		Log.d(TAG,"done form display");
+		//populateSpinner();
+		Log.d(TAG,"laod form- populating spinner");
 		//Set Date
 		mDateText.setOnClickListener(new View.OnClickListener() {
 
@@ -501,7 +495,9 @@ public class ReceiptEntryActivity extends Activity {
 		mDay = cal.get(Calendar.DAY_OF_MONTH);
 		mDate = cal.getTime();
 		mDateText.setText(new SimpleDateFormat("MM/dd/yy").format(mDate).toString());
+		Log.d(TAG,"laod form- going to use mDbHelper");
 		setPaymentMethod(mDbHelper.getMostlyUsedPayment());
+		Log.d(TAG,"laod form- used mDbHelper with success");
 	}
 
 	private void populateSpinner() {
@@ -518,7 +514,6 @@ public class ReceiptEntryActivity extends Activity {
 		else
 			temp.addAll(sortedList);
 		
-		//temp.addAll(sortedList);
 		for(String category : categoryList){
 			if(categoryList.contains(category) && !temp.contains(category))
 				temp.add(category);
@@ -570,6 +565,7 @@ public class ReceiptEntryActivity extends Activity {
 		mDateText.setText("");
 		mCategoryText.setSelection(0);
 		mPayment.clearCheck();
+		mRecurring.setChecked(true);
 	}
 
 	// modified by charles 11/18
@@ -578,43 +574,9 @@ public class ReceiptEntryActivity extends Activity {
 			saveState(null);
 			setResult(RESULT_OK);
 			finish();
-			//rotatePhoto();
 		}
 	}
 
-	 /** Finds the proper location on the SD card where we can save files. */
-	private File getStorageDirectory() {
-	
-		String state = null;
-		try {
-			state = Environment.getExternalStorageState();
-		} catch (RuntimeException e) {
-			Log.e(TAG, "Is the SD card visible?", e);
-			showErrorMessage("Error", "Required external storage (such as an SD card) is unavailable.");
-		}
-	
-		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-		  
-			try {
-				return getExternalFilesDir(Environment.MEDIA_MOUNTED);
-			} catch (NullPointerException e) {
-				// We get an error here if the SD card is visible, but full
-				Log.e(TAG, "External storage is unavailable");
-				showErrorMessage("Error", "Required external storage (such as an SD card) is full or unavailable.");
-			}
-		
-		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-			// We can only read the media
-			Log.e(TAG, "External storage is read-only");
-			showErrorMessage("Error", "Required external storage (such as an SD card) is unavailable for data storage.");
-		} else {
-			// Something else is wrong. It may be one of many other states, but all we need
-			// to know is we can neither read nor write
-			Log.e(TAG, "External storage is unavailable");
-			showErrorMessage("Error", "Required external storage (such as an SD card) is unavailable or corrupted.");
-	    }
-	    return null;
-	}
 	
 	/**
 	   * Displays an error message dialog box to the user on the UI thread.
@@ -751,6 +713,7 @@ public class ReceiptEntryActivity extends Activity {
 			int payment = getPaymentMethod().getValue();
 			int categoryIndex = mCategoryText.getSelectedItemPosition();
 			String category = (newCat != null) ? newCat : categoryList.get(categoryIndex);	
+			boolean recurring = mRecurring.isChecked();
 			
 			if (mRowId == null) {
 				Log.d(ACTIVITY_SERVICE, "mRowId == null");
@@ -758,11 +721,11 @@ public class ReceiptEntryActivity extends Activity {
 				// added by charles 11/18 11.20
 				long id = 0;
 				if (this.cloudStorage) {
-					id = mDbHelper.createReceipt(description, amount, mDate, category, payment, mImage, this.cloudStorage);
+					id = mDbHelper.createReceipt(description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
 					//Toast.makeText(this, "CloudStorageNew", Toast.LENGTH_SHORT).show();
 					this.cloudStorage = false;
 				} else {
-					id = mDbHelper.createReceipt(description, amount, mDate, category, payment, mImage, this.cloudStorage);
+					id = mDbHelper.createReceipt(description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
 					//Toast.makeText(this, "NoCloudStorageNew", Toast.LENGTH_SHORT).show();
 				}
 				
@@ -776,11 +739,11 @@ public class ReceiptEntryActivity extends Activity {
 				Log.d(ACTIVITY_SERVICE, "mRowId != null");
 				// added by charles 11/18 11.20
 				if (this.cloudStorage) {
-					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, mImage, this.cloudStorage);
+					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, recurring,  mImage, this.cloudStorage);
 					this.cloudStorage = false;
 					Toast.makeText(this, "CloudStorageOld", Toast.LENGTH_SHORT).show();
 				} else {
-					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, mImage, this.cloudStorage);
+					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
 					Toast.makeText(this, "NoCloudStorageOld", Toast.LENGTH_SHORT).show();
 				}
 				

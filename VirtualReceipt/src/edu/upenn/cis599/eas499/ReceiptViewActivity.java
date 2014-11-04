@@ -4,6 +4,7 @@
 
 package edu.upenn.cis599.eas499;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,7 +13,6 @@ import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.Entry;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.android.AuthActivity;
-import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.TokenPair;
@@ -53,8 +53,6 @@ public class ReceiptViewActivity extends Activity {
 
 	// added by charles 11.21
 	DropboxAPI<AndroidAuthSession> mApi = null;
-    //final static private String APP_KEY = "dc36xrc9680qj3w";
-    //final static private String APP_SECRET = "t7roqse0foysbru";
     final static private String APP_KEY = "w9bii3r2hidx7jp";
     final static private String APP_SECRET = "uxrrek6sgqf6uv0";
     final static private AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
@@ -116,7 +114,6 @@ public class ReceiptViewActivity extends Activity {
         // Check to make sure that we have a valid app key
         if (APP_KEY.startsWith("CHANGE") ||
                 APP_SECRET.startsWith("CHANGE")) {
-            //showToast("You must apply for an app key and secret from developers.dropbox.com, and add them to the DBRoulette ap before trying it.");
             finish();
             return;
         }
@@ -128,10 +125,6 @@ public class ReceiptViewActivity extends Activity {
         testIntent.setData(Uri.parse(uri));
         PackageManager pm = getPackageManager();
         if (0 == pm.queryIntentActivities(testIntent, 0).size()) {
-     /*       showToast("URL scheme in your app's " +
-                    "manifest is not set up correctly. You should have a " +
-                    "com.dropbox.client2.android.AuthActivity with the " +
-                    "scheme: " + scheme);*/
             finish();
         }
     }
@@ -173,14 +166,9 @@ public class ReceiptViewActivity extends Activity {
 			int paymentIntVal = Integer.valueOf(receipt.getString(receipt.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_PAYMENT)));
 			mPaymentText.setText(PaymentType.get(paymentIntVal).getText());
 			//Pull category text from db.
-			//int rowId = Integer.valueOf(receipt.getString(receipt.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_CATEGORY)));
 			mCategoryText.setText(receipt.getString(receipt.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_CATEGORY)));
 			receipt.close();
-			//Log.d(ACTIVITY_SERVICE, "RowId: " + String.valueOf(rowId));
-			//Cursor category = mDbHelper.fetchCategory(rowId);
-			//startManagingCursor(category);
-			//mCategoryText.setText(category.getString(category.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_NAME)));
-		}
+			}
 	}
 	
 	@Override
@@ -217,35 +205,17 @@ public class ReceiptViewActivity extends Activity {
 			if (!dirent.isDir || dirent.contents == null) {
 				return;
 			}
-			File file = new File(DATA_PATH + dateString);
+			//File file = new File(DATA_PATH + dateString);
+			File file = new File(DATA_PATH + "viewImg.jpg");
 			outputStream = new FileOutputStream(file);
 			mApi.getFile("/" + dateString, null, outputStream, null);
 			outputStream.close();
-			BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-			
-			bitmapOptions.inSampleSize = 1;
-			Bitmap bitmapData = BitmapFactory.decodeFile(DATA_PATH + dateString, bitmapOptions);
-			ByteArrayOutputStream outputStream1 = new ByteArrayOutputStream(); 
-			bitmapData.compress(CompressFormat.PNG, 0, outputStream1);
-			byte[] imageData = outputStream1.toByteArray();										
-			bitmapData.recycle();
-			
-			file.delete();
-			
-			if(imageData != null){
-				Log.d(ACTIVITY_SERVICE, imageData.toString());
-				Intent intent = new Intent(this, ImageOCRActivity.class);
-				intent.putExtra("image", imageData);
-				intent.putExtra("mode", 1);
-				startActivity(intent);
-			}else{
-				Context context = getApplicationContext();
-				int duration = Toast.LENGTH_SHORT;
-				Toast toast = Toast.makeText(context, "The image has already been deleted", duration);
-				toast.show();
-			}
+
+			Intent intent = new Intent(this, ImageOCRActivity.class);
+			intent.putExtra("mode", 1);
+			startActivity(intent);
 		} catch (Exception e) {
-			
+			showErrorMessage("Error", "Failed to download from Dropbox");	
         }
 	} 
 	
@@ -274,9 +244,19 @@ public class ReceiptViewActivity extends Activity {
 				startManagingCursor(c);
 				byte[] bitmapData = c.getBlob(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_IMAGE));
 				if(bitmapData != null){
-					Log.d(ACTIVITY_SERVICE, bitmapData.toString());
+					File file = new File(DATA_PATH + "viewImg.jpg");
+					FileOutputStream fw;
+					try {
+						fw = new FileOutputStream(file.getAbsoluteFile());
+						BufferedOutputStream bw = new BufferedOutputStream(fw);
+
+						bw.write(bitmapData);
+						bw.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					Intent intent = new Intent(this, ImageOCRActivity.class);
-					intent.putExtra("image", bitmapData);
+					//intent.putExtra("image", bitmapData);
 					intent.putExtra("mode", 1);
 					c.close();
 					startActivity(intent);
