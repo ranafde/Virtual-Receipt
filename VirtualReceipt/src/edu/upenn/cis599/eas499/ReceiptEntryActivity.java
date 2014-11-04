@@ -143,17 +143,16 @@ public class ReceiptEntryActivity extends Activity {
 		mDbHelper = new ReceiptDbAdapter(this);
 		mDbHelper.open();
 		
-		if(categoryList == null){
-			categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
-		}
 		
 		
 		if(value.equals("Yes")){
 			Log.d(ACTIVITY_SERVICE, "Entering ReceiptEntryActivity. Income. Loading form");
 			if(categoryList == null){
-				categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
+				Log.v(TAG,"Trying to populate the list");
+				categoryList = new ArrayList<String>(Arrays.asList("Income","Budget"));
 			}
 			loadForm();
+			categoryList = null;
 			Log.d(ACTIVITY_SERVICE, "Done loading form for income");
 		}
 		else{
@@ -203,6 +202,7 @@ public class ReceiptEntryActivity extends Activity {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					Log.d(TAG, "loading form for adding receipts");
 					loadForm();
+					categoryList = null;
 					Log.d(TAG, "DONE loading form for adding receipts !!!");
 				}
 			});
@@ -212,6 +212,7 @@ public class ReceiptEntryActivity extends Activity {
 			mApi = new DropboxAPI<AndroidAuthSession>(session);
 			checkAppKeySetup();
 		}	
+		
 	}
 	
 	
@@ -486,8 +487,8 @@ public class ReceiptEntryActivity extends Activity {
 		});
 
 		Log.d(TAG,"done form display");
-		//populateSpinner();
-		Log.d(TAG,"laod form- populating spinner");
+		populateSpinner();
+		Log.d(TAG,"load form- populating spinner");
 		//Set Date
 		mDateText.setOnClickListener(new View.OnClickListener() {
 
@@ -503,7 +504,7 @@ public class ReceiptEntryActivity extends Activity {
 		mDay = cal.get(Calendar.DAY_OF_MONTH);
 		mDate = cal.getTime();
 		mDateText.setText(new SimpleDateFormat("MM/dd/yy").format(mDate).toString());
-		Log.d(TAG,"laod form- going to use mDbHelper");
+		Log.d(TAG,"load form- going to use mDbHelper");
 		setPaymentMethod(mDbHelper.getMostlyUsedPayment());
 		Log.d(TAG,"laod form- used mDbHelper with success");
 	}
