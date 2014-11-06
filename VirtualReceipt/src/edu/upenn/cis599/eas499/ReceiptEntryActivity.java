@@ -370,7 +370,7 @@ public class ReceiptEntryActivity extends Activity {
 			else if (resultCode == Activity.RESULT_OK) {
 				Log.v(TAG, "Photo accepted. Converting to bitmap.");
 				/*TODO: Make this background */
-				SomeTask task = new SomeTask();
+				SavingImage task = new SavingImage();
 				Log.v(TAG, "Calling background thread");
 				task.execute();
 				Log.v(TAG, "Calling launch selection");
@@ -930,7 +930,7 @@ public class ReceiptEntryActivity extends Activity {
 
 
 	/** Inner class for implementing progress bar before fetching data **/
-	private class SomeTask extends AsyncTask<Void, Void, Integer> 
+	private class SavingImage extends AsyncTask<Void, Void, Integer> 
 	{
 		private ProgressDialog Dialog = new ProgressDialog(ReceiptEntryActivity.this);
 

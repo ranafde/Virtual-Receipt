@@ -10,10 +10,10 @@ import java.util.Map;
 
 import edu.upenn.cis599.R;
 import edu.upenn.cis599.eas499.ChartViewerActivity;
-
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -27,11 +27,12 @@ import android.widget.SimpleAdapter;
 public class StatisticsViewerActivity extends ListActivity {
 	/* initalization should be done in constructor */
 	private MyChartInterface[] mCharts = new MyChartInterface[] {
-			new PieChartCategory(), new LineChart(), new PieChartPayment() };
+			new PieChartCategory(), new LineChart(), new PieChartPayment(), new BarGraphIncomeExpenditure() };
 
 	private String[] mMenuText;
 
 	private String[] mMenuSummary;
+	private static final String TAG = "StatisticsViewerActivity.java";
 
 	/** Called when the activity is first created. */
 	/* meaningless variable names */
@@ -75,9 +76,12 @@ public class StatisticsViewerActivity extends ListActivity {
 		super.onListItemClick(l, v, position, id);
 		Intent intent;
 		// mark
+		Log.d(TAG,"In onListItemClick");
 		if (position == 2) {
 			intent = mCharts[position - 1].execute(this);
-		} else {
+			Log.d(TAG, "position: " + position + " intent name:"+mCharts[position-1].getName());
+		} 
+		else {
 			intent = new Intent(getApplicationContext(),
 					ChartViewerActivity.class);
 			intent.putExtra("selection", position);

@@ -4,7 +4,11 @@
 
 package edu.upenn.cis599.eas499;
 
+import org.achartengine.ChartFactory;
+import org.achartengine.chart.BarChart;
+
 import edu.upenn.cis599.R;
+import edu.upenn.cis599.charts.BarGraphIncomeExpenditure;
 import edu.upenn.cis599.charts.PieChartCategory;
 import edu.upenn.cis599.charts.PieChartPayment;
 import android.app.Activity;
@@ -38,6 +42,8 @@ public class ChartViewerActivity extends Activity {
 	private static final int CURRENT_MONTH = 0;
     private static final int CURRENT_YEAR = 1;
     private static final int ALL_TIME = 2;
+    
+    private static final String TAG = "ChartViewerActivity.java";
 	
 	private GestureDetector gestureDetector;
 	View.OnTouchListener gestureListener;
@@ -55,6 +61,7 @@ public class ChartViewerActivity extends Activity {
 		setContentView(R.layout.graph_view);
 		Bundle extras = getIntent().getExtras();
 		int selection = extras.getInt("selection");
+		Log.v(TAG,"selection is:"+selection);
 		
 		setCharts(selection);
 	}	
@@ -63,7 +70,7 @@ public class ChartViewerActivity extends Activity {
 		LinearLayout currentMonthGraph = (LinearLayout) findViewById(R.id.current_month);
 		LinearLayout currentYearGraph = (LinearLayout) findViewById(R.id.current_year);
 		LinearLayout allTimeGraph = (LinearLayout) findViewById(R.id.all_time);
-		if(selection == CATEGORY){
+		if(selection == 1){
 			PieChartCategory cmChart = new PieChartCategory();
 			View cmChartView = cmChart.getCategoryView(this, CURRENT_MONTH);
 			currentMonthGraph.addView(cmChartView, new LinearLayout.LayoutParams
@@ -79,7 +86,7 @@ public class ChartViewerActivity extends Activity {
 			allTimeGraph.addView(atChartView, new LinearLayout.LayoutParams
 					(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 			
-		}else{
+		}else if(selection == 3){
 			PieChartPayment cmChart = new PieChartPayment();
 			View cmChartView = cmChart.getPaymentView(this, CURRENT_MONTH);
 			currentMonthGraph.addView(cmChartView, new LinearLayout.LayoutParams
@@ -96,7 +103,17 @@ public class ChartViewerActivity extends Activity {
 					(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 		}
 		
-		
+		/*else{
+			Log.v(TAG,"bar graph");
+			BarGraphIncomeExpenditure barGraph = new BarGraphIncomeExpenditure();
+			View barGraphView = barGraph.getView();
+			/*View barGraphView = ChartFactory.getBarChartIntent(context,
+					buildDataset(titles, months, monthlyStatistics), renderer,
+					BarChart.Type.DEFAULT);
+			currentYearGraph.addView(barGraphView, new LinearLayout.LayoutParams
+					(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+			
+		}*/
 		/* Annie's way to create charts
 		ImageView cGraph = (ImageView) findViewById(R.id.c_graph_img);
 		String mUrl = getCategoryChartUrl();
