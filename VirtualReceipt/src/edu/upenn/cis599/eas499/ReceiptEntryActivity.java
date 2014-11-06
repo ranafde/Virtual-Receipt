@@ -73,6 +73,7 @@ import android.widget.Toast;
  * alert pop-up for error to avoid crashing the app and notify the user about the specific error, 
  *
  */
+
 public class ReceiptEntryActivity extends Activity {
 
 	private ReceiptDbAdapter mDbHelper;
@@ -206,7 +207,6 @@ public class ReceiptEntryActivity extends Activity {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					Log.d(TAG, "loading form for adding receipts");
 					loadForm();
-					//categoryList = null;
 					Log.d(TAG, "DONE loading form for adding receipts !!!");
 				}
 			});
@@ -338,7 +338,6 @@ public class ReceiptEntryActivity extends Activity {
 			e.printStackTrace();
 		}
 		if (exif != null) {
-			Log.e(TAG, "This" + exif.getAttribute(ExifInterface.TAG_ORIENTATION));
 			if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("6")){
 				photo = rotate(photo, 90);
 			}else if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("8")){
@@ -346,7 +345,6 @@ public class ReceiptEntryActivity extends Activity {
 			}else if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("3")){
 				photo = rotate(photo, 180);
 			} else {
-				Log.e(TAG, "Rotating second 90");
 				photo = rotate(photo, 0);
 			}
 
@@ -780,13 +778,18 @@ public class ReceiptEntryActivity extends Activity {
 	private void saveState(String newCat) {
 
 		try {
-			Log.d(ACTIVITY_SERVICE, "Made it to saveState()");
 			String description = mDescriptionText.getText().toString();
 			double amount = Double.parseDouble(mAmountText.getText().toString());
 			int payment = getPaymentMethod().getValue();
 			int categoryIndex = mCategoryText.getSelectedItemPosition();
 			String category = (newCat != null) ? newCat : categoryList.get(categoryIndex);	
 			boolean recurring = mRecurring.isChecked();
+			
+			Calendar cal = Calendar.getInstance();
+		    cal.setTime(mDate);
+		    int year = cal.get(Calendar.YEAR);
+		    int month = cal.get(Calendar.MONTH);
+		    int day = 1;
 
 			if (mRowId == null) {
 				Log.d(ACTIVITY_SERVICE, "mRowId == null");
@@ -795,11 +798,37 @@ public class ReceiptEntryActivity extends Activity {
 				long id = 0;
 				if (this.cloudStorage) {
 					id = mDbHelper.createReceipt(description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
-					//Toast.makeText(this, "CloudStorageNew", Toast.LENGTH_SHORT).show();
+					if(recurring) {
+						for(int i = 1; i < 12; i++) {
+							month = (month + 1)%12;
+							if (month == 0){
+								year = year + 1;
+							}
+							cal.clear();
+							cal.set(Calendar.MONTH, month);
+							cal.set(Calendar.YEAR, year);
+							cal.set(Calendar.DAY_OF_MONTH,day);
+							Date tdate = cal.getTime();
+							mDbHelper.createReceipt(description, amount, tdate, category, payment, recurring, mImage, this.cloudStorage);
+						}
+					}
 					this.cloudStorage = false;
 				} else {
 					id = mDbHelper.createReceipt(description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
-					//Toast.makeText(this, "NoCloudStorageNew", Toast.LENGTH_SHORT).show();
+					if(recurring) {
+						for(int i = 1; i < 12; i++) {
+							month = (month + 1)%12;
+							if (month == 0){
+								year = year + 1;
+							}
+							cal.clear();
+							cal.set(Calendar.MONTH, month);
+							cal.set(Calendar.YEAR, year);
+							cal.set(Calendar.DAY_OF_MONTH,day);
+							Date tdate = cal.getTime();
+							mDbHelper.createReceipt(description, amount, tdate, category, payment, recurring, mImage, this.cloudStorage);
+						}
+					}
 				}
 
 				// commented out by charles 11/18
@@ -813,10 +842,38 @@ public class ReceiptEntryActivity extends Activity {
 				// added by charles 11/18 11.20
 				if (this.cloudStorage) {
 					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, recurring,  mImage, this.cloudStorage);
+					if(recurring) {
+						for(int i = 1; i < 12; i++) {
+							month = (month + 1)%12;
+							if (month == 0){
+								year = year + 1;
+							}
+							cal.clear();
+							cal.set(Calendar.MONTH, month);
+							cal.set(Calendar.YEAR, year);
+							cal.set(Calendar.DAY_OF_MONTH,day);
+							Date tdate = cal.getTime();
+							mDbHelper.createReceipt(description, amount, tdate, category, payment, recurring, mImage, this.cloudStorage);
+						}
+					}
 					this.cloudStorage = false;
 					Toast.makeText(this, "CloudStorageOld", Toast.LENGTH_SHORT).show();
 				} else {
 					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
+					if(recurring) {
+						for(int i = 1; i < 12; i++) {
+							month = (month + 1)%12;
+							if (month == 0){
+								year = year + 1;
+							}
+							cal.clear();
+							cal.set(Calendar.MONTH, month);
+							cal.set(Calendar.YEAR, year);
+							cal.set(Calendar.DAY_OF_MONTH,day);
+							Date tdate = cal.getTime();
+							mDbHelper.createReceipt(description, amount, tdate, category, payment, recurring, mImage, this.cloudStorage);
+						}
+					}
 					Toast.makeText(this, "NoCloudStorageOld", Toast.LENGTH_SHORT).show();
 				}
 
@@ -839,22 +896,42 @@ public class ReceiptEntryActivity extends Activity {
 
 
 	private void saveStateIncome() {
+		
 
 		try {
-			Log.d(ACTIVITY_SERVICE, "Made it to saveStateIncome()");
 			String description = mDescriptionText.getText().toString();
 			double amount = Double.parseDouble(mAmountText.getText().toString());
 			//			int payment = getPaymentMethod().getValue();
 			int categoryIndex = mCategoryText.getSelectedItemPosition();
 			String category = categoryListIncome.get(categoryIndex);	
 			boolean recurring = mRecurring.isChecked();
+			
+			Calendar cal = Calendar.getInstance();
+		    cal.setTime(mDate);
+		    int year = cal.get(Calendar.YEAR);
+		    int month = cal.get(Calendar.MONTH);
+		    int day = 1;
+		    
 			Log.d(ACTIVITY_SERVICE, "Made it to saveStateIncome3");
 			if (mRowId == null) {
 				Log.d(ACTIVITY_SERVICE, "mRowId == null");
 
 				long id = 0;
 				id = mDbHelper.createReceipt(description, amount, mDate, category, 0, recurring, null, false);
-				Log.v(TAG, "The ID = "+id);
+				if(recurring) {
+					for(int i = 1; i < 12; i++) {
+						month = (month + 1)%12;
+						if (month == 0){
+							year = year + 1;
+						}
+						cal.clear();
+						cal.set(Calendar.MONTH, month);
+						cal.set(Calendar.YEAR, year);
+						cal.set(Calendar.DAY_OF_MONTH,day);
+						Date tdate = cal.getTime();
+						mDbHelper.createReceipt(description, amount, tdate, category, 0, recurring, null, false);
+					}
+				}
 				if (id > 0) {
 					mRowId = id;
 				}
