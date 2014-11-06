@@ -37,10 +37,10 @@ public class VirtualReceiptActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDbHelper = new ReceiptDbAdapter(this);
+        /*mDbHelper = new ReceiptDbAdapter(this);
         mDbHelper.open();
         mDbHelper.updateBlobFields();
-        mDbHelper.close();
+        mDbHelper.close();*/
         
         menuArray = new ArrayList<String>();
         menuArray.add(getResources().getString(R.string.add_income));
