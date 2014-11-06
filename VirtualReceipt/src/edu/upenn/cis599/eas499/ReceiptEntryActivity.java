@@ -544,22 +544,23 @@ public class ReceiptEntryActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// added by charles 11/18
-				if (mImage != null && mImage.length != 0) {
-					AlertDialog.Builder alert = new AlertDialog.Builder(ReceiptEntryActivity.this);
-					alert.setTitle("Store options");
-					alert.setMessage("Would you like to store the photo on dropbox?");
-					alert.setPositiveButton("Yes", new StorageOptions(ReceiptEntryActivity.this, true));
-					alert.setNegativeButton("No", new StorageOptions(ReceiptEntryActivity.this, false));
-					alert.show();
-				} else {
-					cloudStore();
-				}
+//				if (mImage != null && mImage.length != 0) {
+//					AlertDialog.Builder alert = new AlertDialog.Builder(ReceiptEntryActivity.this);
+//					alert.setTitle("Store options");
+//					alert.setMessage("Would you like to store the photo on dropbox?");
+//					alert.setPositiveButton("Yes", new StorageOptions(ReceiptEntryActivity.this, true));
+//					alert.setNegativeButton("No", new StorageOptions(ReceiptEntryActivity.this, false));
+//					alert.show();
+//				} else {
+//					cloudStore();
+//				}
+				saveStateIncome();
 			}
 		});
 
 		Log.d(TAG,"done form display");
 		populateSpinnerIncome();
-		Log.d(TAG,"laod form- populating spinner");
+		Log.d(TAG,"load form- populating spinner");
 		//Set Date
 		mDateText.setOnClickListener(new View.OnClickListener() {
 
@@ -858,6 +859,71 @@ public class ReceiptEntryActivity extends Activity {
 		}
 	}
 
+	
+	private void saveStateIncome() {
+
+		try {
+			Log.d(ACTIVITY_SERVICE, "Made it to saveStateIncome()");
+//			String description = mDescriptionText.getText().toString();
+			double amount = Double.parseDouble(mAmountText.getText().toString());
+//			int payment = getPaymentMethod().getValue();
+			int categoryIndex = mCategoryText.getSelectedItemPosition();
+			String category = categoryList.get(categoryIndex);	
+			boolean recurring = mRecurring.isChecked();
+			
+			if (mRowId == null) {
+				Log.d(ACTIVITY_SERVICE, "mRowId == null");
+
+				// added by charles 11/18 11.20
+				long id = 0;
+//				if (this.cloudStorage) {
+					id = mDbHelper.createReceipt(null, amount, mDate, category, 0, recurring, null, false);
+					Log.v(TAG, "The ID = "+id);
+					//Toast.makeText(this, "CloudStorageNew", Toast.LENGTH_SHORT).show();
+//					this.cloudStorage = false;
+//				} else {
+//					id = mDbHelper.createReceipt(description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
+//					//Toast.makeText(this, "NoCloudStorageNew", Toast.LENGTH_SHORT).show();
+//				}
+				
+				// commented out by charles 11/18
+				//long id = mDbHelper.createReceipt(description, amount, mDate, category, payment, mImage);
+				if (id > 0) {
+					mRowId = id;
+				}
+				Toast.makeText(this, "Receipt successfully added", Toast.LENGTH_SHORT).show();
+			} 
+//			else {
+//				Log.d(ACTIVITY_SERVICE, "mRowId != null");
+//				// added by charles 11/18 11.20
+//				if (this.cloudStorage) {
+//					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, recurring,  mImage, this.cloudStorage);
+//					this.cloudStorage = false;
+//					Toast.makeText(this, "CloudStorageOld", Toast.LENGTH_SHORT).show();
+//				} else {
+//					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
+//					Toast.makeText(this, "NoCloudStorageOld", Toast.LENGTH_SHORT).show();
+//				}
+				
+				// commented out by charles 11/18
+				//mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, mImage);
+				Toast.makeText(this, "Receipt successfully updated", Toast.LENGTH_SHORT).show();
+//			}
+		} catch (Exception e) {
+			Log.d(ACTIVITY_SERVICE, "Exception occured");
+			//Log.d(TAG, e.printStackTrace());
+
+			if (e.getClass().equals(ParseException.class)) {
+				Log.d(ACTIVITY_SERVICE, "Parse Exception");
+				showErrorMessage("Error: Invalid Date", "Please enter date in correct format (MM/dd/yy) or use the date picker to select a valid date.");
+			}
+			else if (e.getClass().equals(NumberFormatException.class)) {
+				Log.d(ACTIVITY_SERVICE, "Number Format Exception");
+				showErrorMessage("Error: Invalid Amount", "Please enter a valid number for the amount.");
+			}
+		}
+	}
+	
 	private PaymentType getPaymentMethod() {
 		RadioButton b1 = (RadioButton) findViewById(R.id.radio_cash);
 		RadioButton b2 = (RadioButton) findViewById(R.id.radio_credit);
