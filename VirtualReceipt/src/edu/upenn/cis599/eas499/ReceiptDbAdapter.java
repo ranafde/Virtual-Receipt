@@ -240,9 +240,9 @@ public class ReceiptDbAdapter {
 		String cMonth = (Month + 1 < 10) ? '0' + Integer.toString(Month + 1) : Integer.toString(Month + 1);
 		
 		switch(duration){
-			case CURRENT_YEAR : c = mDb.rawQuery("select category, sum(amount) as sum from receipt where strftime(\'%Y\', date) = \'" + cYear + "' group by category", null); break;
-			case ALL_TIME : c = mDb.rawQuery("select category, sum(amount) as sum from receipt group by category", null); break;
-			default : c = mDb.rawQuery("select category, sum(amount) as sum from receipt where strftime(\'%Y-%m\', date) = \'" + cYear + "-" + cMonth + "' group by category", null); break;
+			case CURRENT_YEAR : c = mDb.rawQuery("select category, sum(amount) as sum from receipt where (category <> 'Income') AND (category <> 'Budget') AND strftime(\'%Y\', date) = \'" + cYear + "' group by category", null); break;
+			case ALL_TIME : c = mDb.rawQuery("select category, sum(amount) as sum from receipt where (category <> 'Income') AND (category <> 'Budget') group by category", null); break;
+			default : c = mDb.rawQuery("select category, sum(amount) as sum from receipt where (category <> 'Income') AND (category <> 'Budget') AND strftime(\'%Y-%m\', date) = \'" + cYear + "-" + cMonth + "' group by category", null); break;
 		}
 		
     	//Cursor c = mDb.rawQuery("select category, sum(amount) as sum from receipt group by category", null);
@@ -312,9 +312,9 @@ public class ReceiptDbAdapter {
 			
 		Log.v(TAG, "\'" + cYear + "-" + cMonth + "'");
 		switch(duration){
-			case CURRENT_YEAR : c = mDb.rawQuery("select payment, sum(amount) as sum from receipt where strftime(\'%Y\', date) = \'" + cYear + "' group by payment", null); break;
-			case ALL_TIME : c = mDb.rawQuery("select payment, sum(amount) as sum from receipt group by payment", null); break;
-			default : c = mDb.rawQuery("select payment, sum(amount) as sum from receipt where strftime(\'%Y-%m\', date) = \'" + cYear + "-" + cMonth + "' group by payment", null); break;
+			case CURRENT_YEAR : c = mDb.rawQuery("select payment, sum(amount) as sum from receipt where (category <> 'Income') AND (category <> 'Budget') AND (strftime(\'%Y\', date) = \'" + cYear + "') group by payment", null); break;
+			case ALL_TIME : c = mDb.rawQuery("select payment, sum(amount) as sum from receipt where (category <> 'Income') AND (category<>'Budget') group by payment", null); break;
+			default : c = mDb.rawQuery("select payment, sum(amount) as sum from receipt where (category<> 'Income') AND (category<>'Budget') AND (strftime(\'%Y-%m\', date) = \'" + cYear + "-" + cMonth + "') group by payment", null); break;
 		}
 		
     	//Cursor c = mDb.rawQuery("select payment, sum(amount) as sum from receipt group by payment", null);
@@ -343,8 +343,8 @@ public class ReceiptDbAdapter {
 		Calendar cal = Calendar.getInstance();
 		int cYear = cal.get(Calendar.YEAR);
 		switch(duration){
-			case ALL_TIME : c = mDb.rawQuery("select strftime(\'%m\', date) as date, sum(amount) as sum from receipt group by strftime(\'%m\', date)", null); break;
-			default : c = mDb.rawQuery("select strftime(\'%m\', date) as date, sum(amount) as sum from receipt where strftime(\'%Y\', date) = \'" + cYear + "' group by strftime(\'%m\', date)", null); break;
+			case ALL_TIME : c = mDb.rawQuery("select strftime(\'%m\', date) as date, sum(amount) as sum from receipt where (category<> 'Income') AND (category<>'Budget') group by strftime(\'%m\', date)", null); break;
+			default : c = mDb.rawQuery("select strftime(\'%m\', date) as date, sum(amount) as sum from receipt where (category<> 'Income') AND (category<>'Budget') AND (strftime(\'%Y\', date) = \'" + cYear + "') group by strftime(\'%m\', date)", null); break;
 		}
 		double[] sumList = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 			
