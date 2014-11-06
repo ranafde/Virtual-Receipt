@@ -135,6 +135,7 @@ public class ReceiptDbAdapter {
      */
     @SuppressLint("SimpleDateFormat")
 	public long createReceipt(String description, double amount, Date date, String category, int payment, boolean recurring, byte[] image, boolean flag) {
+    	Log.v(TAG,"Creating a Receipt");
     	ContentValues initialValues = new ContentValues();
     	initialValues.put(KEY_DESCRIPTION, description);
     	initialValues.put(KEY_AMOUNT, amount);
@@ -146,8 +147,10 @@ public class ReceiptDbAdapter {
     	
     	//added by charles 11.20
     	initialValues.put(KEY_FLAG, flag ? 1 : 0);
-    	
+    	Log.v(TAG,"Created a Receipt");
+
     	return mDb.insert(DATABASE_TABLE_RECEIPT, null, initialValues);
+
     }
     
     /**

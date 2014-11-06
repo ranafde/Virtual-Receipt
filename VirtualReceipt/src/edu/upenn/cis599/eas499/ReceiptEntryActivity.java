@@ -110,43 +110,43 @@ public class ReceiptEntryActivity extends Activity {
 	private Uri mImageCaptureUri;
 	public static ArrayList<String> categoryList;
 	public static ArrayList<String> categoryListIncome;
-	
+
 	private boolean isAddClicked = false;
-	
+
 	// added by charles 18/11
 	private boolean cloudStorage = false;
 	private Button mSave;
-	
+
 	// added by charles 11.20
 	DropboxAPI<AndroidAuthSession> mApi;
 	final static private String APP_KEY = "w9bii3r2hidx7jp";
-    final static private String APP_SECRET = "uxrrek6sgqf6uv0";
-    final static private AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
+	final static private String APP_SECRET = "uxrrek6sgqf6uv0";
+	final static private AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
 	final static private String ACCOUNT_PREFS_NAME = "prefs";
-    final static private String ACCESS_KEY_NAME = "ACCESS_KEY";
-    final static private String ACCESS_SECRET_NAME = "ACCESS_SECRET";
-    private boolean linking = false;
+	final static private String ACCESS_KEY_NAME = "ACCESS_KEY";
+	final static private String ACCESS_SECRET_NAME = "ACCESS_SECRET";
+	private boolean linking = false;
 
-    private SyncToDropbox upload = null;
+	private SyncToDropbox upload = null;
 	protected long captureTime;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		Bundle extras = getIntent().getExtras();
 		String value="No";
 		if (extras != null) {
-		    value = extras.getString("Income");
-		    Log.v(TAG,"Value received from other activity"+value);
+			value = extras.getString("Income");
+			Log.v(TAG,"Value received from other activity"+value);
 		}
-		
+
 		/* Open Database connection */
 		mDbHelper = new ReceiptDbAdapter(this);
 		mDbHelper.open();
-		
-		
-		
+
+
+
 		if(value.equals("Yes")){
 			Log.d(ACTIVITY_SERVICE, "Entering ReceiptEntryActivity. Income. Loading form");
 
@@ -160,23 +160,23 @@ public class ReceiptEntryActivity extends Activity {
 		else{
 			Log.d(ACTIVITY_SERVICE, "Entering ReceiptEntryActivity. Adding receipt");
 			isAddClicked = false;
-			
+
 			/* initialize categoryList as follows */
 			if(categoryList == null){
 				categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
 			}
 			Log.v(TAG, "Entering ReceiptEntryActivity");
-	
+
 			// Setting up Tesseract
 			if(_path == null && trainData == null)
 				initialize();		
-			
+
 			// Prompt for adding an image of receipt
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 			alert.setTitle("Upload a Receipt");
 			alert.setMessage("Would you like to add a receipt image?");
 			alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-	
+
 				@Override
 				public void onClick(DialogInterface dialog, int whichButton) {
 					//Go to Camera and take picture to store in db
@@ -197,11 +197,11 @@ public class ReceiptEntryActivity extends Activity {
 						// Barcode Scanner has seen crashes in the wild of this variety:
 						// java.?lang.?RuntimeException: Fail to connect to camera service
 						showErrorMessage("Error", "Could not initialize camera. Please try restarting device.");
-				    }
+					}
 				}
 			});
 			alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
-	
+
 				@Override
 				public void onClick(DialogInterface dialog, int whichButton) {
 					Log.d(TAG, "loading form for adding receipts");
@@ -216,70 +216,70 @@ public class ReceiptEntryActivity extends Activity {
 			mApi = new DropboxAPI<AndroidAuthSession>(session);
 			checkAppKeySetup();
 		}	
-		
+
 	}
-	
-	
-	
+
+
+
 	// added by charles 11.20
 	private AndroidAuthSession buildSession() {
-        AppKeyPair appKeyPair = new AppKeyPair(APP_KEY, APP_SECRET);
-        AndroidAuthSession session;
+		AppKeyPair appKeyPair = new AppKeyPair(APP_KEY, APP_SECRET);
+		AndroidAuthSession session;
 
-        String[] stored = getKeys();
-        if (stored != null) {
-            AccessTokenPair accessToken = new AccessTokenPair(stored[0], stored[1]);
-            session = new AndroidAuthSession(appKeyPair, ACCESS_TYPE, accessToken);
-        } else {
-            session = new AndroidAuthSession(appKeyPair, ACCESS_TYPE);
-        }
+		String[] stored = getKeys();
+		if (stored != null) {
+			AccessTokenPair accessToken = new AccessTokenPair(stored[0], stored[1]);
+			session = new AndroidAuthSession(appKeyPair, ACCESS_TYPE, accessToken);
+		} else {
+			session = new AndroidAuthSession(appKeyPair, ACCESS_TYPE);
+		}
 
-        return session;
-    }
-	
+		return session;
+	}
+
 	private void checkAppKeySetup() {
-        // Check to make sure that we have a valid app key
-        if (APP_KEY.startsWith("CHANGE") ||
-                APP_SECRET.startsWith("CHANGE")) {
-            //showToast("You must apply for an app key and secret from developers.dropbox.com, and add them to the DBRoulette ap before trying it.");
-            finish();
-            return;
-        }
+		// Check to make sure that we have a valid app key
+		if (APP_KEY.startsWith("CHANGE") ||
+				APP_SECRET.startsWith("CHANGE")) {
+			//showToast("You must apply for an app key and secret from developers.dropbox.com, and add them to the DBRoulette ap before trying it.");
+			finish();
+			return;
+		}
 
-        // Check if the app has set up its manifest properly.
-        Intent testIntent = new Intent(Intent.ACTION_VIEW);
-        String scheme = "db-" + APP_KEY;
-        String uri = scheme + "://" + AuthActivity.AUTH_VERSION + "/test";
-        testIntent.setData(Uri.parse(uri));
-        PackageManager pm = getPackageManager();
-        if (0 == pm.queryIntentActivities(testIntent, 0).size()) {
-            finish();
-        }
-    }
-	
+		// Check if the app has set up its manifest properly.
+		Intent testIntent = new Intent(Intent.ACTION_VIEW);
+		String scheme = "db-" + APP_KEY;
+		String uri = scheme + "://" + AuthActivity.AUTH_VERSION + "/test";
+		testIntent.setData(Uri.parse(uri));
+		PackageManager pm = getPackageManager();
+		if (0 == pm.queryIntentActivities(testIntent, 0).size()) {
+			finish();
+		}
+	}
+
 	private String[] getKeys() {
-        SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
-        String key = prefs.getString(ACCESS_KEY_NAME, null);
-        String secret = prefs.getString(ACCESS_SECRET_NAME, null);
-        if (key != null && secret != null) {
-        	String[] ret = new String[2];
-        	ret[0] = key;
-        	ret[1] = secret;
-        	return ret;
-        } else {
-        	return null;
-        }
-    }
+		SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
+		String key = prefs.getString(ACCESS_KEY_NAME, null);
+		String secret = prefs.getString(ACCESS_SECRET_NAME, null);
+		if (key != null && secret != null) {
+			String[] ret = new String[2];
+			ret[0] = key;
+			ret[1] = secret;
+			return ret;
+		} else {
+			return null;
+		}
+	}
 
 	private void storeKeys(String key, String secret) {
-        // Save the access key for later
-        SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
-        Editor edit = prefs.edit();
-        edit.putString(ACCESS_KEY_NAME, key);
-        edit.putString(ACCESS_SECRET_NAME, secret);
-        edit.commit();
-    }
-	
+		// Save the access key for later
+		SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
+		Editor edit = prefs.edit();
+		edit.putString(ACCESS_KEY_NAME, key);
+		edit.putString(ACCESS_SECRET_NAME, secret);
+		edit.commit();
+	}
+
 	private void initialize(){
 		String[] paths = new String[] { DATA_PATH, DATA_PATH + "tessdata/" };
 		for (String path : paths) {
@@ -323,14 +323,14 @@ public class ReceiptEntryActivity extends Activity {
 		BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
 		bitmapOptions.inSampleSize = 1;
 		Bitmap photo = BitmapFactory.decodeFile(_path, bitmapOptions);
-		
+
 		// added by charles
 		Display display = getWindowManager().getDefaultDisplay(); 
 		int width = display.getWidth();
 		int height = display.getHeight();
 
 		photo = Bitmap.createScaledBitmap(photo, width, height, true);
-		
+
 		ExifInterface exif = null;
 		try {
 			exif = new ExifInterface(_path);
@@ -349,7 +349,7 @@ public class ReceiptEntryActivity extends Activity {
 				Log.e(TAG, "Rotating second 90");
 				photo = rotate(photo, 0);
 			}
-			
+
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
 			photo.compress(CompressFormat.PNG, 0, outputStream);
 			mImage = outputStream.toByteArray();										
@@ -359,7 +359,7 @@ public class ReceiptEntryActivity extends Activity {
 			Log.e(TAG, "EXIF not found");
 		}
 	}
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){  
 		switch (requestCode) {
@@ -374,17 +374,17 @@ public class ReceiptEntryActivity extends Activity {
 				Log.v(TAG, "Calling background thread");
 				task.execute();
 				Log.v(TAG, "Calling launch selection");
-				
+
 				/*
 				try{					
 					rotatePhoto();
-					
+
 				}catch(Exception e){
 					showErrorMessage("Error", "Decoding Bitmap Error.");				
 				}
-				
+
 				launchSelection();
-				*/
+				 */
 			}
 			break;
 		case IMAGE_SELECTION:
@@ -405,7 +405,7 @@ public class ReceiptEntryActivity extends Activity {
 			break;
 		}
 	}
-	
+
 	/**
 	 * Added by charles 11/18
 	 * @author charles
@@ -415,12 +415,12 @@ public class ReceiptEntryActivity extends Activity {
 
 		private ReceiptEntryActivity a;
 		private boolean cloud = false;
-		
+
 		public StorageOptions(ReceiptEntryActivity a, boolean cloud) {
 			this.a = a;
 			this.cloud = cloud;
 		}
-		
+
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			a.setCloudStorage(cloud);
@@ -435,31 +435,31 @@ public class ReceiptEntryActivity extends Activity {
 				cloudStore();
 			}
 		}
-		
-	}
-	
-    /** CIS599
-     * Yiran Qin
-     */
-	public static Bitmap rotate(Bitmap bitmap, int degree) {
-	    int w = bitmap.getWidth();
-	    int h = bitmap.getHeight();
 
-	    Matrix mtx = new Matrix();
-	    mtx.postRotate(degree, w / 2, h / 2);
-	    Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
-	    Log.v("map", "a" + w + h);
-	    
-	    Bitmap result = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap .getWidth(), scaledBitmap .getHeight(), mtx, true);
-	    Log.v("map", "b" + result.getWidth() + result.getHeight());
-	    return result;
+	}
+
+	/** CIS599
+	 * Yiran Qin
+	 */
+	public static Bitmap rotate(Bitmap bitmap, int degree) {
+		int w = bitmap.getWidth();
+		int h = bitmap.getHeight();
+
+		Matrix mtx = new Matrix();
+		mtx.postRotate(degree, w / 2, h / 2);
+		Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
+		Log.v("map", "a" + w + h);
+
+		Bitmap result = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap .getWidth(), scaledBitmap .getHeight(), mtx, true);
+		Log.v("map", "b" + result.getWidth() + result.getHeight());
+		return result;
 	}
 
 	private void launchSelection() {
 		try{
 			Intent intent = new Intent(getApplicationContext(), ImageOCRActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//			intent.putExtra("image", mImage);
+			//			intent.putExtra("image", mImage);
 			intent.putExtra("mode", 0);
 			Log.d(TAG, "Launching ImageOCRActivity");
 			startActivityForResult(intent, IMAGE_SELECTION);
@@ -469,9 +469,9 @@ public class ReceiptEntryActivity extends Activity {
 	}
 
 
-	
-	
-	
+
+
+
 	private void loadForm() {
 		Log.d(TAG,"loading form");
 		setContentView(R.layout.receipt_entry);
@@ -504,7 +504,7 @@ public class ReceiptEntryActivity extends Activity {
 
 		Log.d(TAG,"done form display");
 		populateSpinner();
- 
+
 		Log.d(TAG,"load form- populating spinner");
 
 		//Set Date
@@ -526,13 +526,14 @@ public class ReceiptEntryActivity extends Activity {
 		setPaymentMethod(mDbHelper.getMostlyUsedPayment());
 		Log.d(TAG,"laod form- used mDbHelper with success");
 	}
-	
+
 	private void loadFormIncome() {
 		Log.d(TAG,"loading income form");
 		setContentView(R.layout.income);
 		Log.d(TAG,"The layout for income is loaded.");
 		//mDescriptionText = (EditText) findViewById(R.id.description);
 		//mDescriptionText.setText("");
+		mDescriptionText = (EditText) findViewById(id.description);
 		mAmountText = (EditText) findViewById(id.amount);
 		mDateText = (EditText) findViewById(id.date);
 		mPayment = (RadioGroup) findViewById(id.payment);
@@ -543,24 +544,13 @@ public class ReceiptEntryActivity extends Activity {
 		mSave.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				// added by charles 11/18
-//				if (mImage != null && mImage.length != 0) {
-//					AlertDialog.Builder alert = new AlertDialog.Builder(ReceiptEntryActivity.this);
-//					alert.setTitle("Store options");
-//					alert.setMessage("Would you like to store the photo on dropbox?");
-//					alert.setPositiveButton("Yes", new StorageOptions(ReceiptEntryActivity.this, true));
-//					alert.setNegativeButton("No", new StorageOptions(ReceiptEntryActivity.this, false));
-//					alert.show();
-//				} else {
-//					cloudStore();
-//				}
 				saveStateIncome();
 			}
 		});
 
 		Log.d(TAG,"done form display");
 		populateSpinnerIncome();
-		Log.d(TAG,"load form- populating spinner");
+		Log.d(TAG,"load form- populating spinneri");
 		//Set Date
 		mDateText.setOnClickListener(new View.OnClickListener() {
 
@@ -577,14 +567,13 @@ public class ReceiptEntryActivity extends Activity {
 		mDate = cal.getTime();
 		mDateText.setText(new SimpleDateFormat("MM/dd/yy").format(mDate).toString());
 		Log.d(TAG,"laod form- going to use mDbHelper");
-		setPaymentMethod(mDbHelper.getMostlyUsedPayment());
 		Log.d(TAG,"laod form- used mDbHelper with success");
 	}
 
 	private void populateSpinner() {
 		ArrayList<String> sortedList = mDbHelper.sortByCategory();
 		ArrayList<String> temp = new ArrayList<String>();
-		
+
 		String matchingCategory = mDbHelper.findMatchingCategory(mDescriptionText.getText().toString());
 		if(matchingCategory != null){
 			temp.add(matchingCategory);
@@ -595,7 +584,7 @@ public class ReceiptEntryActivity extends Activity {
 		}
 		else
 			temp.addAll(sortedList);
-		
+
 		for(String category : categoryList){
 			if(categoryList.contains(category) && !temp.contains(category))
 				temp.add(category);
@@ -608,12 +597,12 @@ public class ReceiptEntryActivity extends Activity {
 		mCategoryText = (Spinner) findViewById(R.id.category);
 		mCategoryText.setAdapter(adapter);
 	}
-	
-	
+
+
 	@SuppressLint("SimpleDateFormat")
 	private void populateSpinnerIncome() {
 		Log.e(TAG,"Database has been accessed - income");
-		
+
 		String[] items = categoryListIncome.toArray(new String[categoryListIncome.size()]);
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -672,20 +661,20 @@ public class ReceiptEntryActivity extends Activity {
 		}
 	}
 
-	
+
 	/**
-	   * Displays an error message dialog box to the user on the UI thread.
-	   * 
-	   * @param title The title for the dialog box
-	   * @param message The error message to be displayed
-	   */
+	 * Displays an error message dialog box to the user on the UI thread.
+	 * 
+	 * @param title The title for the dialog box
+	 * @param message The error message to be displayed
+	 */
 	void showErrorMessage(String title, String message) {
 		new AlertDialog.Builder(this)
-	    	.setTitle(title)
-	    	.setMessage(message)
-	    	.setOnCancelListener(new FinishListener(this))
-	    	.setPositiveButton( "Done", new FinishListener(this))
-	    	.show();
+		.setTitle(title)
+		.setMessage(message)
+		.setOnCancelListener(new FinishListener(this))
+		.setPositiveButton( "Done", new FinishListener(this))
+		.show();
 	}
 
 	@Override
@@ -702,7 +691,7 @@ public class ReceiptEntryActivity extends Activity {
 	private boolean isOthersCategory(){
 		int categoryIndex = mCategoryText.getSelectedItemPosition();
 		String category = categoryList.get(categoryIndex);	
-		
+
 		if(category.equalsIgnoreCase("Others")){
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
@@ -714,65 +703,65 @@ public class ReceiptEntryActivity extends Activity {
 			alert.setView(input);
 
 			alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				String newCategory = input.getText().toString();
-				categoryList.add(newCategory);
-				saveState(newCategory);
-				setResult(RESULT_OK);
-				finish();
-			}
+				public void onClick(DialogInterface dialog, int whichButton) {
+					String newCategory = input.getText().toString();
+					categoryList.add(newCategory);
+					saveState(newCategory);
+					setResult(RESULT_OK);
+					finish();
+				}
 			});
 
 			alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			  public void onClick(DialogInterface dialog, int whichButton) {
-				  saveState(null);
-				  setResult(RESULT_OK);
-				  finish();
-			  }
+				public void onClick(DialogInterface dialog, int whichButton) {
+					saveState(null);
+					setResult(RESULT_OK);
+					finish();
+				}
 			});
 
 			alert.show();
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
-    protected void onResume() {
-        super.onResume();
-        if (!linking) {}
-        else cloudStore();
+	protected void onResume() {
+		super.onResume();
+		if (!linking) {}
+		else cloudStore();
 	}
-	
+
 	public void cloudStore() {
 		AndroidAuthSession session = mApi.getSession();
-        
+
 		if (session.isLinked()) {}
 		else if (session.authenticationSuccessful()) {
-        	try {
-        		// Mandatory call to complete the auth
-        		session.finishAuthentication();
-        		
-        		// Store it locally in our app for later use
-        		TokenPair tokens = session.getAccessTokenPair();
-        		storeKeys(tokens.key, tokens.secret);
-        		
-                //setLoggedIn(true);
+			try {
+				// Mandatory call to complete the auth
+				session.finishAuthentication();
 
-            } catch (IllegalStateException e) {
-            	//showToast("Couldn't authenticate with Dropbox:" + e.getLocalizedMessage());
-                Log.i(TAG, "Error authenticating", e);
-            }
-        }
-        String dateString = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(mDate);
+				// Store it locally in our app for later use
+				TokenPair tokens = session.getAccessTokenPair();
+				storeKeys(tokens.key, tokens.secret);
+
+				//setLoggedIn(true);
+
+			} catch (IllegalStateException e) {
+				//showToast("Couldn't authenticate with Dropbox:" + e.getLocalizedMessage());
+				Log.i(TAG, "Error authenticating", e);
+			}
+		}
+		String dateString = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(mDate);
 		dateString = dateString.replace(" ", "");
 		dateString = dateString.replace(":", "");
 		dateString = dateString.replace("-", "");
 		dateString = dateString + ".jpg";
-    	
+
 		File file = new File(DATA_PATH + dateString);
-		
+
 		FileOutputStream fw;
 		try {
 			fw = new FileOutputStream(file.getAbsoluteFile());
@@ -783,7 +772,7 @@ public class ReceiptEntryActivity extends Activity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		if (cloudStorage) {
 			upload = new SyncToDropbox(ReceiptEntryActivity.this, mApi, "/", file);
 			upload.execute();
@@ -798,7 +787,7 @@ public class ReceiptEntryActivity extends Activity {
 		onSaveButtonClick();
 		linking = false;
 	}
-	
+
 	private void saveState(String newCat) {
 
 		try {
@@ -809,7 +798,7 @@ public class ReceiptEntryActivity extends Activity {
 			int categoryIndex = mCategoryText.getSelectedItemPosition();
 			String category = (newCat != null) ? newCat : categoryList.get(categoryIndex);	
 			boolean recurring = mRecurring.isChecked();
-			
+
 			if (mRowId == null) {
 				Log.d(ACTIVITY_SERVICE, "mRowId == null");
 
@@ -823,7 +812,7 @@ public class ReceiptEntryActivity extends Activity {
 					id = mDbHelper.createReceipt(description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
 					//Toast.makeText(this, "NoCloudStorageNew", Toast.LENGTH_SHORT).show();
 				}
-				
+
 				// commented out by charles 11/18
 				//long id = mDbHelper.createReceipt(description, amount, mDate, category, payment, mImage);
 				if (id > 0) {
@@ -841,7 +830,7 @@ public class ReceiptEntryActivity extends Activity {
 					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
 					Toast.makeText(this, "NoCloudStorageOld", Toast.LENGTH_SHORT).show();
 				}
-				
+
 				// commented out by charles 11/18
 				//mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, mImage);
 				Toast.makeText(this, "Receipt successfully updated", Toast.LENGTH_SHORT).show();
@@ -859,59 +848,35 @@ public class ReceiptEntryActivity extends Activity {
 		}
 	}
 
-	
+
 	private void saveStateIncome() {
 
 		try {
 			Log.d(ACTIVITY_SERVICE, "Made it to saveStateIncome()");
-//			String description = mDescriptionText.getText().toString();
+			String description = mDescriptionText.getText().toString();
 			double amount = Double.parseDouble(mAmountText.getText().toString());
-//			int payment = getPaymentMethod().getValue();
+			//			int payment = getPaymentMethod().getValue();
 			int categoryIndex = mCategoryText.getSelectedItemPosition();
-			String category = categoryList.get(categoryIndex);	
+			String category = categoryListIncome.get(categoryIndex);	
 			boolean recurring = mRecurring.isChecked();
-			
+			Log.d(ACTIVITY_SERVICE, "Made it to saveStateIncome3");
 			if (mRowId == null) {
 				Log.d(ACTIVITY_SERVICE, "mRowId == null");
-
-				// added by charles 11/18 11.20
-				long id = 0;
-//				if (this.cloudStorage) {
-					id = mDbHelper.createReceipt(null, amount, mDate, category, 0, recurring, null, false);
-					Log.v(TAG, "The ID = "+id);
-					//Toast.makeText(this, "CloudStorageNew", Toast.LENGTH_SHORT).show();
-//					this.cloudStorage = false;
-//				} else {
-//					id = mDbHelper.createReceipt(description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
-//					//Toast.makeText(this, "NoCloudStorageNew", Toast.LENGTH_SHORT).show();
-//				}
 				
-				// commented out by charles 11/18
-				//long id = mDbHelper.createReceipt(description, amount, mDate, category, payment, mImage);
+				long id = 0;
+				id = mDbHelper.createReceipt(description, amount, mDate, category, 0, recurring, null, false);
+				Log.v(TAG, "The ID = "+id);
 				if (id > 0) {
 					mRowId = id;
 				}
-				Toast.makeText(this, "Receipt successfully added", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "Income successfully added", Toast.LENGTH_SHORT).show();
 			} 
-//			else {
-//				Log.d(ACTIVITY_SERVICE, "mRowId != null");
-//				// added by charles 11/18 11.20
-//				if (this.cloudStorage) {
-//					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, recurring,  mImage, this.cloudStorage);
-//					this.cloudStorage = false;
-//					Toast.makeText(this, "CloudStorageOld", Toast.LENGTH_SHORT).show();
-//				} else {
-//					mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, recurring, mImage, this.cloudStorage);
-//					Toast.makeText(this, "NoCloudStorageOld", Toast.LENGTH_SHORT).show();
-//				}
-				
-				// commented out by charles 11/18
-				//mDbHelper.updateReceipt(mRowId, description, amount, mDate, category, payment, mImage);
-				Toast.makeText(this, "Receipt successfully updated", Toast.LENGTH_SHORT).show();
-//			}
+			setResult(RESULT_OK);
+			finish();
+
 		} catch (Exception e) {
 			Log.d(ACTIVITY_SERVICE, "Exception occured");
-			//Log.d(TAG, e.printStackTrace());
+			Log.d(TAG, e.toString());
 
 			if (e.getClass().equals(ParseException.class)) {
 				Log.d(ACTIVITY_SERVICE, "Parse Exception");
@@ -923,7 +888,7 @@ public class ReceiptEntryActivity extends Activity {
 			}
 		}
 	}
-	
+
 	private PaymentType getPaymentMethod() {
 		RadioButton b1 = (RadioButton) findViewById(R.id.radio_cash);
 		RadioButton b2 = (RadioButton) findViewById(R.id.radio_credit);
@@ -939,7 +904,7 @@ public class ReceiptEntryActivity extends Activity {
 		}
 		return PaymentType.CASH;
 	}
-	
+
 	private void setPaymentMethod(String type) {
 		RadioButton b1 = (RadioButton) findViewById(R.id.radio_cash);
 		RadioButton b2 = (RadioButton) findViewById(R.id.radio_credit);
@@ -963,45 +928,45 @@ public class ReceiptEntryActivity extends Activity {
 		this.cloudStorage = cloudStorage;
 	}
 
-	
+
 	/** Inner class for implementing progress bar before fetching data **/
 	private class SomeTask extends AsyncTask<Void, Void, Integer> 
 	{
-	    private ProgressDialog Dialog = new ProgressDialog(ReceiptEntryActivity.this);
+		private ProgressDialog Dialog = new ProgressDialog(ReceiptEntryActivity.this);
 
-	    @Override
-	    protected void onPreExecute()
-	    {
-	    	
-	        Dialog.setMessage("Saving image...");
-	        Dialog.show();
-	    }
+		@Override
+		protected void onPreExecute()
+		{
 
-	    @Override
-	    protected Integer doInBackground(Void... params) 
-	    {
-	        //Task for doing something 
-	    	try{					
+			Dialog.setMessage("Saving image...");
+			Dialog.show();
+		}
+
+		@Override
+		protected Integer doInBackground(Void... params) 
+		{
+			//Task for doing something 
+			try{					
 				rotatePhoto();
-				
+
 			}catch(Exception e){
 				showErrorMessage("Error", "Decoding Bitmap Error.");				
 			}
-			
+
 			launchSelection();
-	        return 0;
-	    }
+			return 0;
+		}
 
-	    @Override
-	    protected void onPostExecute(Integer result)
-	    {
+		@Override
+		protected void onPostExecute(Integer result)
+		{
 
-	        if(result==0)
-	        {
-	        	Log.v(TAG,"Success for spinner");  //do some thing
-	        }
-	        // after completed finished the progressbar
-	        Dialog.dismiss();
-	    }
+			if(result==0)
+			{
+				Log.v(TAG,"Success for spinner");  //do some thing
+			}
+			// after completed finished the progressbar
+			Dialog.dismiss();
+		}
 	}
 }
