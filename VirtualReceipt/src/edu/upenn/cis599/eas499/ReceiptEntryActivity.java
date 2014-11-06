@@ -36,6 +36,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -49,6 +50,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -152,7 +154,7 @@ public class ReceiptEntryActivity extends Activity {
 				categoryList = new ArrayList<String>(Arrays.asList("Income","Budget"));
 			}
 			loadForm();
-			categoryList = null;
+			//categoryList = null;
 			Log.d(ACTIVITY_SERVICE, "Done loading form for income");
 		}
 		else{
@@ -187,7 +189,9 @@ public class ReceiptEntryActivity extends Activity {
 							mImageCaptureUri = Uri.fromFile(imageFile);
 							cameraIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 							cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
+							Log.d(ACTIVITY_SERVICE, "Started...");
 							startActivityForResult(cameraIntent, CAMERA_REQUEST);
+							Log.d(ACTIVITY_SERVICE, "Done");
 						} 
 					} catch (RuntimeException e) {
 						// Barcode Scanner has seen crashes in the wild of this variety:
@@ -202,7 +206,7 @@ public class ReceiptEntryActivity extends Activity {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					Log.d(TAG, "loading form for adding receipts");
 					loadForm();
-					categoryList = null;
+					//categoryList = null;
 					Log.d(TAG, "DONE loading form for adding receipts !!!");
 				}
 			});
@@ -365,6 +369,13 @@ public class ReceiptEntryActivity extends Activity {
 			}
 			else if (resultCode == Activity.RESULT_OK) {
 				Log.v(TAG, "Photo accepted. Converting to bitmap.");
+				/*TODO: Make this background */
+				SomeTask task = new SomeTask();
+				Log.v(TAG, "Calling background thread");
+				task.execute();
+				Log.v(TAG, "Calling launch selection");
+				
+				/*
 				try{					
 					rotatePhoto();
 					
@@ -373,9 +384,11 @@ public class ReceiptEntryActivity extends Activity {
 				}
 				
 				launchSelection();
+				*/
 			}
 			break;
 		case IMAGE_SELECTION:
+			Log.v(TAG, " in IMAGE_SELECTION");
 			if (resultCode == Activity.RESULT_OK) {
 				try{
 					Bundle extras = data.getExtras();
@@ -488,7 +501,7 @@ public class ReceiptEntryActivity extends Activity {
 
 		Log.d(TAG,"done form display");
 		populateSpinner();
-
+ 
 		Log.d(TAG,"load form- populating spinner");
 
 		//Set Date
@@ -814,4 +827,45 @@ public class ReceiptEntryActivity extends Activity {
 		this.cloudStorage = cloudStorage;
 	}
 
+	
+	/** Inner class for implementing progress bar before fetching data **/
+	private class SomeTask extends AsyncTask<Void, Void, Integer> 
+	{
+	    private ProgressDialog Dialog = new ProgressDialog(ReceiptEntryActivity.this);
+
+	    @Override
+	    protected void onPreExecute()
+	    {
+	    	
+	        Dialog.setMessage("Saving image...");
+	        Dialog.show();
+	    }
+
+	    @Override
+	    protected Integer doInBackground(Void... params) 
+	    {
+	        //Task for doing something 
+	    	try{					
+				rotatePhoto();
+				
+			}catch(Exception e){
+				showErrorMessage("Error", "Decoding Bitmap Error.");				
+			}
+			
+			launchSelection();
+	        return 0;
+	    }
+
+	    @Override
+	    protected void onPostExecute(Integer result)
+	    {
+
+	        if(result==0)
+	        {
+	        	Log.v(TAG,"Success for spinner");  //do some thing
+	        }
+	        // after completed finished the progressbar
+	        Dialog.dismiss();
+	    }
+	}
 }
