@@ -374,17 +374,6 @@ public class ReceiptEntryActivity extends Activity {
 				Log.v(TAG, "Calling background thread");
 				task.execute();
 				Log.v(TAG, "Calling launch selection");
-
-				/*
-				try{					
-					rotatePhoto();
-
-				}catch(Exception e){
-					showErrorMessage("Error", "Decoding Bitmap Error.");				
-				}
-
-				launchSelection();
-				 */
 			}
 			break;
 		case IMAGE_SELECTION:
@@ -862,7 +851,7 @@ public class ReceiptEntryActivity extends Activity {
 			Log.d(ACTIVITY_SERVICE, "Made it to saveStateIncome3");
 			if (mRowId == null) {
 				Log.d(ACTIVITY_SERVICE, "mRowId == null");
-				
+
 				long id = 0;
 				id = mDbHelper.createReceipt(description, amount, mDate, category, 0, recurring, null, false);
 				Log.v(TAG, "The ID = "+id);
@@ -967,6 +956,7 @@ public class ReceiptEntryActivity extends Activity {
 			}
 			// after completed finished the progressbar
 			Dialog.dismiss();
+			
 		}
 	}
 }
