@@ -370,21 +370,10 @@ public class ReceiptEntryActivity extends Activity {
 			else if (resultCode == Activity.RESULT_OK) {
 				Log.v(TAG, "Photo accepted. Converting to bitmap.");
 				/*TODO: Make this background */
-				SomeTask task = new SomeTask();
+				ProgressBar task = new ProgressBar();
 				Log.v(TAG, "Calling background thread");
 				task.execute();
 				Log.v(TAG, "Calling launch selection");
-
-				/*
-				try{					
-					rotatePhoto();
-
-				}catch(Exception e){
-					showErrorMessage("Error", "Decoding Bitmap Error.");				
-				}
-
-				launchSelection();
-				 */
 			}
 			break;
 		case IMAGE_SELECTION:
@@ -862,7 +851,7 @@ public class ReceiptEntryActivity extends Activity {
 			Log.d(ACTIVITY_SERVICE, "Made it to saveStateIncome3");
 			if (mRowId == null) {
 				Log.d(ACTIVITY_SERVICE, "mRowId == null");
-				
+
 				long id = 0;
 				id = mDbHelper.createReceipt(description, amount, mDate, category, 0, recurring, null, false);
 				Log.v(TAG, "The ID = "+id);
@@ -930,7 +919,7 @@ public class ReceiptEntryActivity extends Activity {
 
 
 	/** Inner class for implementing progress bar before fetching data **/
-	private class SomeTask extends AsyncTask<Void, Void, Integer> 
+	private class ProgressBar extends AsyncTask<Void, Void, Integer> 
 	{
 		private ProgressDialog Dialog = new ProgressDialog(ReceiptEntryActivity.this);
 
@@ -967,6 +956,7 @@ public class ReceiptEntryActivity extends Activity {
 			}
 			// after completed finished the progressbar
 			Dialog.dismiss();
+			
 		}
 	}
 }
