@@ -19,7 +19,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.concurrent.ExecutionException;
-
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.android.AuthActivity;
@@ -27,11 +26,11 @@ import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.TokenPair;
 import com.dropbox.client2.session.Session.AccessType;
-
 import edu.upenn.cis599.FinishListener;
 import edu.upenn.cis599.R;
 import edu.upenn.cis599.R.id;
 import edu.upenn.cis599.SyncToDropbox;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -108,6 +107,7 @@ public class ReceiptEntryActivity extends Activity {
 
 	private Uri mImageCaptureUri;
 	public static ArrayList<String> categoryList;
+	public static ArrayList<String> categoryListIncome;
 	
 	private boolean isAddClicked = false;
 	
@@ -143,17 +143,14 @@ public class ReceiptEntryActivity extends Activity {
 		mDbHelper = new ReceiptDbAdapter(this);
 		mDbHelper.open();
 		
-		if(categoryList == null){
-			categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
-		}
 		
 		
 		if(value.equals("Yes")){
 			Log.d(ACTIVITY_SERVICE, "Entering ReceiptEntryActivity. Income. Loading form");
-			if(categoryList == null){
-				categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
+			if(categoryListIncome == null){
+				categoryListIncome = new ArrayList<String>(Arrays.asList("Income","Budget"));
 			}
-			loadForm();
+			loadFormIncome();
 			Log.d(ACTIVITY_SERVICE, "Done loading form for income");
 		}
 		else{
@@ -455,6 +452,9 @@ public class ReceiptEntryActivity extends Activity {
 	}
 
 
+	
+	
+	
 	private void loadForm() {
 		Log.d(TAG,"loading form");
 		setContentView(R.layout.receipt_entry);
@@ -507,10 +507,64 @@ public class ReceiptEntryActivity extends Activity {
 		setPaymentMethod(mDbHelper.getMostlyUsedPayment());
 		Log.d(TAG,"laod form- used mDbHelper with success");
 	}
+	
+	private void loadFormIncome() {
+		Log.d(TAG,"loading income form");
+		setContentView(R.layout.income);
+		Log.d(TAG,"The layout for income is loaded.");
+		//mDescriptionText = (EditText) findViewById(R.id.description);
+		//mDescriptionText.setText("");
+		mAmountText = (EditText) findViewById(id.amount);
+		mDateText = (EditText) findViewById(id.date);
+		mPayment = (RadioGroup) findViewById(id.payment);
+		Log.d(TAG,"form display");
+		mRecurring = (CheckBox) findViewById(id.check_recurring);
+		//added by charles 11/18
+		mSave = (Button) findViewById(id.save);
+		mSave.setOnClickListener(new View.OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				// added by charles 11/18
+				if (mImage != null && mImage.length != 0) {
+					AlertDialog.Builder alert = new AlertDialog.Builder(ReceiptEntryActivity.this);
+					alert.setTitle("Store options");
+					alert.setMessage("Would you like to store the photo on dropbox?");
+					alert.setPositiveButton("Yes", new StorageOptions(ReceiptEntryActivity.this, true));
+					alert.setNegativeButton("No", new StorageOptions(ReceiptEntryActivity.this, false));
+					alert.show();
+				} else {
+					cloudStore();
+				}
+			}
+		});
+
+		Log.d(TAG,"done form display");
+		populateSpinnerIncome();
+		Log.d(TAG,"laod form- populating spinner");
+		//Set Date
+		mDateText.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				showDialog(DATE_DIALOG_ID);
+			}
+		});
+		//Get current Date
+		final Calendar cal = Calendar.getInstance();
+		mYear = cal.get(Calendar.YEAR);
+		mMonth = cal.get(Calendar.MONTH);
+		mDay = cal.get(Calendar.DAY_OF_MONTH);
+		mDate = cal.getTime();
+		mDateText.setText(new SimpleDateFormat("MM/dd/yy").format(mDate).toString());
+		Log.d(TAG,"laod form- going to use mDbHelper");
+		setPaymentMethod(mDbHelper.getMostlyUsedPayment());
+		Log.d(TAG,"laod form- used mDbHelper with success");
+	}
 
 	private void populateSpinner() {
 		ArrayList<String> sortedList = mDbHelper.sortByCategory();
 		ArrayList<String> temp = new ArrayList<String>();
+		
 		String matchingCategory = mDbHelper.findMatchingCategory(mDescriptionText.getText().toString());
 		if(matchingCategory != null){
 			temp.add(matchingCategory);
@@ -528,6 +582,19 @@ public class ReceiptEntryActivity extends Activity {
 		}
 		categoryList = temp;
 		String[] items = categoryList.toArray(new String[categoryList.size()]);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+		mCategoryText = (Spinner) findViewById(R.id.category);
+		mCategoryText.setAdapter(adapter);
+	}
+	
+	
+	@SuppressLint("SimpleDateFormat")
+	private void populateSpinnerIncome() {
+		Log.e(TAG,"Database has been accessed - income");
+		
+		String[] items = categoryListIncome.toArray(new String[categoryListIncome.size()]);
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 

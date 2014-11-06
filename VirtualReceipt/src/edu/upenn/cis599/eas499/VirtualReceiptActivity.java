@@ -97,6 +97,7 @@ public class VirtualReceiptActivity extends Activity {
     		}
 			else if (label.equals("Add a receipt")) {
     			intent = new Intent(p, ReceiptEntryActivity.class);
+    			intent.putExtra("Income","No");
     			startActivity(intent);
     		}
     		else if (label.equals("View receipts")) {

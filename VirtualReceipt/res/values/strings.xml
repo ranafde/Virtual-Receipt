@@ -2,25 +2,24 @@
 <resources>
 
     <!-- Added by Xiaolu -->
-    <string name ="logo">logo</string>
-    <string name ="spaceholder">spaceholder</string>
+    <string name="logo">logo</string>
+    <string name="spaceholder">spaceholder</string>
     <string name="app_name">Virtual Receipt</string>
+
     <string-array name="menu_items">
-        <item>@string/add_income</item><item>@string/add_receipt</item>
-    	<item>@string/view_receipt</item>
-    	<item>@string/spending_stats</item>
-    	<item>@string/dropbox</item>
-    	
+        <item>@string/add_income</item>
+        <item>@string/add_receipt</item>
+        <item>@string/view_receipt</item>
+        <item>@string/spending_stats</item>
+        <item>@string/dropbox</item>
     </string-array>
+
     <string name="no_items">No menu items</string>
-    
-    
-   	<string name="click">Click</string>
+    <string name="click">Click</string>
     <string name="add_receipt">Add a receipt</string>
     <string name="view_receipt">View receipts</string>
     <string name="spending_stats">View spending statistics</string>
     <string name="dropbox">Sync with dropbox</string>
-    
     <string name="ocr">OCR Text</string>
     <string name="description">Description</string>
     <string name="amount">Amount</string>
@@ -29,6 +28,7 @@
     <string name="choose_category">Choose one:</string>
     <string name="payment_method">Payment Method</string>
     <string name="recurring">Recurring Expense</string>
+    <string name="recurring_income">Recurring</string>
     <string name="cash">Cash</string>
     <string name="credit">Credit</string>
     <string name="debit">Debit</string>
@@ -38,31 +38,26 @@
     <string name="delete">Delete</string>
     <string name="done">Done</string>
     <string name="reselect">Reselect</string>
-    
     <string name="no_receipts">No Receipt Entries Yet</string>
     <string name="menu_insert_receipt">Add Receipt</string>
     <string name="menu_delete_receipt">Delete Receipt</string>
-    
     <string name="no_categories">No Categories Yet</string>
     <string name="menu_insert">Add Category</string>
     <string name="menu_delete">Delete Category</string>
     <string name="menu_edit">Edit Category</string>
     <string name="edit_category">Edit Category</string>
     <string name="confirm">Confirm</string>
-    
     <string name="category_graph">Spending By Category</string>
     <string name="payment_type_graph">Spending By Payment Type</string>
     <string name="date_graph">Spending By Month</string>
-    
     <string name="capture_title">Capture Receipt Image</string>
     <string name="capture">Capture</string>
     <string name="cancel">Cancel</string>
-    
-    <string name="add_values">Add values to the chart</string>    
-	<string name="x">X</string>    
-	<string name="y">Y</string>
-	<string name="add">Add</string>
-	<string name="new_series">New series</string>
-	<string name="add_income">Add Income</string>
+    <string name="add_values">Add values to the chart</string>
+    <string name="x">X</string>
+    <string name="y">Y</string>
+    <string name="add">Add</string>
+    <string name="new_series">New series</string>
+    <string name="add_income">Add Income</string>
 
 </resources>
