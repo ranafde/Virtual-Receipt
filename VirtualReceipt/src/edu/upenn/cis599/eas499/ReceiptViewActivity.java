@@ -38,6 +38,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -169,6 +170,10 @@ public class ReceiptViewActivity extends Activity {
 			//Pull category text from db.
 			mCategoryText.setText(receipt.getString(receipt.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_CATEGORY)));
 			mRecurringText.setText(receipt.getString(receipt.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_RECURRING)).equals("1")?"Yes":"No");
+			if(mRecurringText.getText().equals("No")){
+				Button addReminderButton = (Button) findViewById(R.id.addReminder);
+				addReminderButton.setVisibility(View.GONE);
+			}
 			receipt.close();
 			}
 	}
@@ -221,6 +226,11 @@ public class ReceiptViewActivity extends Activity {
         }
 	} 
 	
+	public void onAddReminderClick(View view) {
+		Log.d("", "AddReminderClicked");
+		Intent intent = new Intent(this, ReminderActivity.class);
+		startActivity(intent);
+	}
 	public void onViewImageClick(View view) {
 		Cursor c = mDbHelper.fetchReceiptFullDate(mRowId);
 
