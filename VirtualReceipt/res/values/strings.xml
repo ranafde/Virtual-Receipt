@@ -16,8 +16,8 @@
 
     <string name="no_items">No menu items</string>
     <string name="click">Click</string>
-    <string name="add_receipt">Add a receipt</string>
-    <string name="view_receipt">View receipts</string>
+    <string name="add_receipt">Add Expense</string>
+    <string name="view_receipt">View Entries</string>
     <string name="spending_stats">View spending statistics</string>
     <string name="dropbox">Sync with dropbox</string>
     <string name="ocr">OCR Text</string>

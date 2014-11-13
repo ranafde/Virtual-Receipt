@@ -3,6 +3,8 @@
  */
 package edu.upenn.cis599.charts;
 
+import java.util.ArrayList;
+
 import org.achartengine.ChartFactory;
 import org.achartengine.chart.BarChart.Type;
 import org.achartengine.model.XYMultipleSeriesDataset;
@@ -56,9 +58,9 @@ public class BarChart extends MyChartHelper {
 	@Override
 	public Intent execute(Context context) {
 		int[] x = { 0,1,2,3,4,5,6,7, 8, 9, 10, 11 };
-		int[] income = { 2000,2500,2700,3000,2800,3500,3700,3800, 0,0,0,0};
-		int[] expense = {2200, 2700, 2900, 2800, 2600, 3000, 3300, 3400, 0, 0, 0, 0 };
-		int[] budget = {2210, 2500, 2700, 2300, 2200, 3100, 3000, 3200, 0, 0, 0, 0};
+		//int[] income = { 2000,2500,2700,3000,2800,3500,3700,3800, 0,0,0,0};
+		//int[] expense = {2200, 2700, 2900, 2800, 2600, 3000, 3300, 3400, 0, 0, 0, 0 };
+		//int[] budget = {2210, 2500, 2700, 2300, 2200, 3100, 3000, 3200, 0, 0, 0, 0};
 
 		String[] mMonth = new String[] {
 				"Jan", "Feb" , "Mar", "Apr", "May", "Jun",
@@ -70,11 +72,30 @@ public class BarChart extends MyChartHelper {
 		XYSeries expenseSeries = new XYSeries("Expense");
 		// Creating an XYSeries for Expense
 		XYSeries budgetSeries = new XYSeries("Budget");
+		
+		/* get income, expense and budget details */
+		ArrayList<double[]> monthlyExpenseDetails = getMonthlySpendingList(context);
+		ArrayList<double[]> monthlyIncomeDetails = getMonthlyIncomeList(context);
+		ArrayList<double[]> monthlyBudgetDetails = getMonthlyBudgetList(context);
+		
+		double[] monthlyIncome = new double[10];
+		double[] monthlyExpenses = new double[10];
+		double[] monthlyBudget= new double[10];
+		
+		monthlyIncome = monthlyIncomeDetails.get(0);
+		monthlyExpenses = monthlyExpenseDetails.get(0);
+		monthlyBudget = monthlyBudgetDetails.get(0);
+		
 		// Adding data to Income and Expense Series
+//		for(int i=0;i<x.length;i++){
+//			incomeSeries.add(i,income[i]);
+//			budgetSeries.add(i, budget[i]);
+//		}
+		
 		for(int i=0;i<x.length;i++){
-			incomeSeries.add(i,income[i]);
-			expenseSeries.add(i,expense[i]);
-			budgetSeries.add(i, budget[i]);
+			incomeSeries.add(i,monthlyIncome[i]);
+			expenseSeries.add(i,monthlyExpenses[i]);
+			budgetSeries.add(i, monthlyBudget[i]);
 		}
 
 		// Creating a dataset to hold each series
@@ -110,6 +131,8 @@ public class BarChart extends MyChartHelper {
 		input[1] = expenseRenderer;
 		input[2] = budgetRenderer;
 		
+		 
+				
 		multiRenderer = addMutlipleRenderer(input);
 
 		// Creating an intent to plot bar chart using dataset and multipleRenderer
@@ -218,4 +241,45 @@ public class BarChart extends MyChartHelper {
 		return xySeries;
 	}
 	
+	private ArrayList<double[]> getMonthlySpendingList(Context context) {
+		ReceiptDbAdapter mDbHelper = new ReceiptDbAdapter(context);
+		mDbHelper.open();
+		ArrayList<double[]> result = new ArrayList<double[]>();
+		double[] currentYearMonthlySpendingList = mDbHelper
+				.retrieveMonthlyPayment(1);
+		double[] allTimeMonthlySpendingList = mDbHelper
+				.retrieveMonthlyPayment(2);
+		result.add(currentYearMonthlySpendingList);
+		result.add(allTimeMonthlySpendingList);
+		mDbHelper.close();
+		return result;
+	}
+	
+	private ArrayList<double[]> getMonthlyIncomeList(Context context) {
+		ReceiptDbAdapter mDbHelper = new ReceiptDbAdapter(context);
+		mDbHelper.open();
+		ArrayList<double[]> result = new ArrayList<double[]>();
+		double[] currentYearMonthlySpendingList = mDbHelper
+				.retrieveMonthlyIncome(1);
+		double[] allTimeMonthlySpendingList = mDbHelper
+				.retrieveMonthlyIncome(2);
+		result.add(currentYearMonthlySpendingList);
+		result.add(allTimeMonthlySpendingList);
+		mDbHelper.close();
+		return result;
+	}
+
+	private ArrayList<double[]> getMonthlyBudgetList(Context context) {
+		ReceiptDbAdapter mDbHelper = new ReceiptDbAdapter(context);
+		mDbHelper.open();
+		ArrayList<double[]> result = new ArrayList<double[]>();
+		double[] currentYearMonthlySpendingList = mDbHelper
+				.retrieveMonthlyBudget(1);
+		double[] allTimeMonthlySpendingList = mDbHelper
+				.retrieveMonthlyBudget(2);
+		result.add(currentYearMonthlySpendingList);
+		result.add(allTimeMonthlySpendingList);
+		mDbHelper.close();
+		return result;
+	}
 }

@@ -89,25 +89,31 @@ public class VirtualReceiptActivity extends Activity {
             String label = txt.getText().toString();
 			Intent intent;
 			Log.d(TAG,"checking labels");
-			if (label.equals("Add Income")) {
+			/* Add Income */
+			if (label.equals(getResources().getString(R.string.add_income))) {
     			intent = new Intent(p, ReceiptEntryActivity.class);
     			intent.putExtra("Income","Yes");
     			Log.d(TAG,"add an income virtual receipt activity");
     			startActivity(intent);
     		}
-			else if (label.equals("Add a receipt")) {
+			/* Add Expense */
+			else if (label.equals(getResources().getString(R.string.add_receipt))) {
     			intent = new Intent(p, ReceiptEntryActivity.class);
     			intent.putExtra("Income","No");
     			startActivity(intent);
     		}
-    		else if (label.equals("View receipts")) {
+			/* View Entries */
+    		else if (label.equals(getResources().getString(R.string.view_receipt))) {
     			intent = new Intent(p, ReceiptsListActivity.class);
     			startActivity(intent);
     		}
-    		else if (label.equals("View spending statistics")) {
+			/*  View spending statistics */
+    		else if (label.equals(getResources().getString(R.string.spending_stats))) {
     			intent = new Intent(p, StatisticsViewerActivity.class);
     			startActivity(intent);
-    		}else if (label.equals("Sync with dropbox")) {
+    		}
+    		/* Sync with dropbox */
+    		else if (label.equals(getResources().getString(R.string.dropbox))) {
     			/*Yiran Qin Dropbox activity to handle all front-end data sharing feature*/
     			intent = new Intent(p, DropboxActivity.class);
     			startActivity(intent);
