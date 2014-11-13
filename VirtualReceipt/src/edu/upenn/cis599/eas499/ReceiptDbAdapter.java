@@ -167,6 +167,7 @@ public class ReceiptDbAdapter {
     	//return mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, null, null, null, null, null);
     	Cursor mCursor =  mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_RECURRING, KEY_IMAGE, KEY_FLAG},"date(date) <= date('now')", null, null, null, null);
     	//return mDb.rawQuery("select _id, description, amount, date, category, payment, recurring, image, flag from Receipt where date(date) <= date('now')", null, null, null, null, null);
+    	
     	if (mCursor != null) {
     		mCursor.moveToFirst();
     	}
@@ -183,6 +184,7 @@ public class ReceiptDbAdapter {
     public Cursor fetchReceipt(long rowId) throws SQLException {
     	Cursor mCursor = mDb.rawQuery("select _id, description, amount, strftime(\'%m-%d-%Y\', date) date, category, payment, recurring, image, flag from Receipt where date(date) <= date('now') AND _id = \'" + rowId + "'", null);
     	//Cursor mCursor = mDb.query(true, DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, KEY_ROWID + "=" + rowId, null, null, null, null, null);
+    	
     	if (mCursor != null) {
     		mCursor.moveToFirst();
     	}
