@@ -164,7 +164,7 @@ public class ReceiptEntryActivity extends Activity {
 
 			/* initialize categoryList as follows */
 			if(categoryList == null){
-				categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Resteraunt", "Recreation", "Others"));
+				categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Restaurant", "Recreation", "Others"));
 			}
 			Log.v(TAG, "Entering ReceiptEntryActivity");
 
@@ -789,7 +789,7 @@ public class ReceiptEntryActivity extends Activity {
 		    cal.setTime(mDate);
 		    int year = cal.get(Calendar.YEAR);
 		    int month = cal.get(Calendar.MONTH);
-		    int day = 1;
+		    int day = cal.get(Calendar.DAY_OF_MONTH);
 
 			if (mRowId == null) {
 				Log.d(ACTIVITY_SERVICE, "mRowId == null");

@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.Map.Entry;
+
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -37,6 +38,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Color;
 import android.os.Environment;
+import android.text.format.DateFormat;
 import android.util.Log;
 
 /**
@@ -153,6 +155,46 @@ public class ReceiptDbAdapter {
 
     }
     
+    
+    
+    /**
+     * Return a Cursor over the list of all user's receipts in the database
+     * 
+     * @return Cursor over all receipts
+     */
+    public Cursor fetchAllReceipts() {
+    	// modified//
+    	//return mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, null, null, null, null, null);
+    	//return mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_RECURRING, KEY_IMAGE, KEY_FLAG}, null, null, null, null, null);
+    	return mDb.rawQuery("select _id, description, amount, date, category, payment, recurring, image, flag from Receipt where date(date) <= date('now')", null);
+    }
+    
+    /**
+     * Return a Cursor positioned at the receipt that matches the given rowId
+     * 
+     * @param rowId id of receipt to retrieve
+     * @return Cursor positioned to matching receipt, if found
+     * @throws SQLException if note could not be found/retreived
+     */
+    public Cursor fetchReceipt(long rowId) throws SQLException {
+    	Cursor mCursor = mDb.rawQuery("select _id, description, amount, strftime(\'%m-%d-%Y\', date) date, category, payment, recurring, image, flag from Receipt where date(date) <= date('now') AND _id = \'" + rowId + "'", null);
+    	//Cursor mCursor = mDb.query(true, DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, KEY_ROWID + "=" + rowId, null, null, null, null, null);
+    	if (mCursor != null) {
+    		mCursor.moveToFirst();
+    	}
+    	return mCursor;
+    }
+    
+    // added by charles 11.21
+    public Cursor fetchReceiptFullDate(long rowId) throws SQLException {
+    	Cursor mCursor = mDb.rawQuery("select _id, description, amount, date, category, payment, image, flag from Receipt where date(date) <= date('now') AND _id = \'" + rowId + "'", null);
+    	//Cursor mCursor = mDb.query(true, DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, KEY_ROWID + "=" + rowId, null, null, null, null, null);
+    	if (mCursor != null) {
+    		mCursor.moveToFirst();
+    	}
+    	return mCursor;
+    }
+    
     /**
      * Delete the receipt with the given rowId.
      * 
@@ -164,40 +206,24 @@ public class ReceiptDbAdapter {
     }
     
     /**
-     * Return a Cursor over the list of all user's receipts in the database
+     * Delete the receipt with the given rowId.
      * 
-     * @return Cursor over all receipts
+     * @param rowId id of receipt to delete
+     * @return true if deleted, false otherwise
      */
-    public Cursor fetchAllReceipts() {
-    	// commented out by charles 11.20
-    	//return mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, null, null, null, null, null);
-    	return mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_RECURRING, KEY_IMAGE, KEY_FLAG}, null, null, null, null, null);
-    }
-    
-    /**
-     * Return a Cursor positioned at the receipt that matches the given rowId
-     * 
-     * @param rowId id of receipt to retrieve
-     * @return Cursor positioned to matching receipt, if found
-     * @throws SQLException if note could not be found/retreived
-     */
-    public Cursor fetchReceipt(long rowId) throws SQLException {
-    	Cursor mCursor = mDb.rawQuery("select _id, description, amount, strftime(\'%m-%d-%Y\', date) date, category, payment, recurring, image, flag from Receipt where _id = \'" + rowId + "'", null);
-    	//Cursor mCursor = mDb.query(true, DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, KEY_ROWID + "=" + rowId, null, null, null, null, null);
-    	if (mCursor != null) {
-    		mCursor.moveToFirst();
+    public boolean deleteRecurringReceipt(String description, long rowId, String rdate) {
+    	String[] date = rdate.split("-");
+    	String ndate = date[2]+"-"+date[0]+"-"+date[1];
+    	boolean result = false;
+    	if(mDb.delete(DATABASE_TABLE_RECEIPT, KEY_ROWID + "=" + rowId, null) > 0) {
+    		if(mDb.delete(DATABASE_TABLE_RECEIPT, KEY_DESCRIPTION + "= '" 
+        	    	+ description + "' AND date('"+ndate+" 12:00:00') < date(date) ", null) > 0) {
+        		result = true;
+        	} else {
+        		result = true;
+        	}
     	}
-    	return mCursor;
-    }
-    
-    // added by charles 11.21
-    public Cursor fetchReceiptFullDate(long rowId) throws SQLException {
-    	Cursor mCursor = mDb.rawQuery("select _id, description, amount, date, category, payment, image, flag from Receipt where _id = \'" + rowId + "'", null);
-    	//Cursor mCursor = mDb.query(true, DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, KEY_ROWID + "=" + rowId, null, null, null, null, null);
-    	if (mCursor != null) {
-    		mCursor.moveToFirst();
-    	}
-    	return mCursor;
+    	return result;
     }
     
     /**
@@ -232,7 +258,7 @@ public class ReceiptDbAdapter {
      */
     
     public HashMap<String, Double> retrieveDataByCategory(int duration){
-    	
+    
     	Cursor c;
 		Calendar cal = Calendar.getInstance();
 		int cYear = cal.get(Calendar.YEAR);
@@ -240,9 +266,9 @@ public class ReceiptDbAdapter {
 		String cMonth = (Month + 1 < 10) ? '0' + Integer.toString(Month + 1) : Integer.toString(Month + 1);
 		
 		switch(duration){
-			case CURRENT_YEAR : c = mDb.rawQuery("select category, sum(amount) as sum from receipt where (category <> 'Income') AND (category <> 'Budget') AND strftime(\'%Y\', date) = \'" + cYear + "' group by category", null); break;
-			case ALL_TIME : c = mDb.rawQuery("select category, sum(amount) as sum from receipt where (category <> 'Income') AND (category <> 'Budget') group by category", null); break;
-			default : c = mDb.rawQuery("select category, sum(amount) as sum from receipt where (category <> 'Income') AND (category <> 'Budget') AND strftime(\'%Y-%m\', date) = \'" + cYear + "-" + cMonth + "' group by category", null); break;
+			case CURRENT_YEAR : c = mDb.rawQuery("select date, category, sum(amount) as sum from receipt where date(date) <= date('now') AND (category <> 'Income') AND (category <> 'Budget') AND strftime(\'%Y\', date) = \'" + cYear + "' group by category", null); break;
+			case ALL_TIME : c = mDb.rawQuery("select date, category, sum(amount) as sum from receipt where date(date) <= date('now') AND (category <> 'Income') AND (category <> 'Budget') group by category", null); break;
+			default : c = mDb.rawQuery("select date, category, sum(amount) as sum from receipt where date(date) <= date('now') AND (category <> 'Income') AND (category <> 'Budget') AND strftime(\'%Y-%m\', date) = \'" + cYear + "-" + cMonth + "' group by category", null); break;
 		}
 		
     	//Cursor c = mDb.rawQuery("select category, sum(amount) as sum from receipt group by category", null);
@@ -312,9 +338,9 @@ public class ReceiptDbAdapter {
 			
 		Log.v(TAG, "\'" + cYear + "-" + cMonth + "'");
 		switch(duration){
-			case CURRENT_YEAR : c = mDb.rawQuery("select payment, sum(amount) as sum from receipt where (category <> 'Income') AND (category <> 'Budget') AND (strftime(\'%Y\', date) = \'" + cYear + "') group by payment", null); break;
-			case ALL_TIME : c = mDb.rawQuery("select payment, sum(amount) as sum from receipt where (category <> 'Income') AND (category<>'Budget') group by payment", null); break;
-			default : c = mDb.rawQuery("select payment, sum(amount) as sum from receipt where (category<> 'Income') AND (category<>'Budget') AND (strftime(\'%Y-%m\', date) = \'" + cYear + "-" + cMonth + "') group by payment", null); break;
+			case CURRENT_YEAR : c = mDb.rawQuery("select date, payment, sum(amount) as sum from receipt where date(date) <= date('now') AND (category <> 'Income') AND (category <> 'Budget') AND (strftime(\'%Y\', date) = \'" + cYear + "') group by payment", null); break;
+			case ALL_TIME : c = mDb.rawQuery("select date, payment, sum(amount) as sum from receipt where date(date) <= date('now') AND (category <> 'Income') AND (category<>'Budget') group by payment", null); break;
+			default : c = mDb.rawQuery("select date, payment, sum(amount) as sum from receipt where date(date) <= date('now') AND (category<> 'Income') AND (category<>'Budget') AND (strftime(\'%Y-%m\', date) = \'" + cYear + "-" + cMonth + "') group by payment", null); break;
 		}
 		
     	//Cursor c = mDb.rawQuery("select payment, sum(amount) as sum from receipt group by payment", null);
@@ -343,8 +369,8 @@ public class ReceiptDbAdapter {
 		Calendar cal = Calendar.getInstance();
 		int cYear = cal.get(Calendar.YEAR);
 		switch(duration){
-			case ALL_TIME : c = mDb.rawQuery("select strftime(\'%m\', date) as date, sum(amount) as sum from receipt where (category<> 'Income') AND (category<>'Budget') group by strftime(\'%m\', date)", null); break;
-			default : c = mDb.rawQuery("select strftime(\'%m\', date) as date, sum(amount) as sum from receipt where (category<> 'Income') AND (category<>'Budget') AND (strftime(\'%Y\', date) = \'" + cYear + "') group by strftime(\'%m\', date)", null); break;
+			case ALL_TIME : c = mDb.rawQuery("select strftime(\'%m\', date) as date, sum(amount) as sum from receipt where date(date) <= date('now') AND (category<> 'Income') AND (category<>'Budget') group by strftime(\'%m\', date)", null); break;
+			default : c = mDb.rawQuery("select strftime(\'%m\', date) as date, sum(amount) as sum from receipt where date(date) <= date('now') AND (category<> 'Income') AND (category<>'Budget') AND (strftime(\'%Y\', date) = \'" + cYear + "') group by strftime(\'%m\', date)", null); break;
 		}
 		double[] sumList = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 			
@@ -368,7 +394,7 @@ public class ReceiptDbAdapter {
      */
     public String findMatchingCategory(String desc){
     	
-    	Cursor c = mDb.rawQuery("select category, description from receipt group by category", null); 
+    	Cursor c = mDb.rawQuery("select date, category, description from receipt where date(date) <= date('now') group by category", null); 
 		String[] descSections = desc.replaceAll("[^a-zA-Z0-9]+", " ").split(" ");
     	
     	if (c != null) {

@@ -291,6 +291,41 @@ public class ReceiptViewActivity extends Activity {
 	 */
 	
 	public void onDeleteClick(View view) {
+		
+		if((mRecurringText.getText().toString()).equals("Yes")) {
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+			alert.setTitle("Delete Recurring Receipt");
+			alert.setMessage("Do you want to delete all future receipts from this entry onwards?");
+			alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int whichButton) {
+					if (mRowId != null) {
+						if(mDbHelper.deleteRecurringReceipt(mDescriptionText.getText().toString(),mRowId,mDateText.getText().toString())){
+							mDbHelper.close();
+							finish();
+						}else{
+							showErrorMessage("Error", "Failed to delete the database entry, it's corrupted.");	
+						}
+					}
+				}
+			});
+			alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int whichButton) {
+					if (mRowId != null) {
+						if(mDbHelper.deleteReceipt(mRowId)){
+							mDbHelper.close();
+							finish();
+						}else{
+							showErrorMessage("Error", "Failed to delete the database entry, it's corrupted.");	
+						}
+					}
+				}
+			});
+			alert.show();
+		} else {
+		
 		// Prompt for adding an image of receipt
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle("Delete Receipt");
@@ -316,6 +351,7 @@ public class ReceiptViewActivity extends Activity {
 			}
 		});
 		alert.show();
+		}
 	}
 	
 	@Override
