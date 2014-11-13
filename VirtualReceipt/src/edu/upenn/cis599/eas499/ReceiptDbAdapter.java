@@ -387,6 +387,62 @@ public class ReceiptDbAdapter {
 		return sumList;
 	}
 	
+	 /**
+     * retrieve monthly income data according to the duration
+     * @param duration
+     * @return
+     */
+	public double[] retrieveMonthlyIncome(int duration){
+		Cursor c;
+		Calendar cal = Calendar.getInstance();
+		int cYear = cal.get(Calendar.YEAR);
+		switch(duration){
+			case ALL_TIME : c = mDb.rawQuery("select strftime(\'%m\', date) as date, sum(amount) as sum from receipt where date(date) <= date('now') AND category = 'Income' group by strftime(\'%m\', date)", null); break;
+			default : c = mDb.rawQuery("select strftime(\'%m\', date) as date, sum(amount) as sum from receipt where date(date) <= date('now') AND category = 'Income' AND (strftime(\'%Y\', date) = \'" + cYear + "') group by strftime(\'%m\', date)", null); break;
+		}
+		double[] sumList = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+			
+		if (c != null) {
+			if (c.moveToFirst()) {
+				do {
+					String month = c.getString(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_DATE));
+					String monthSum = c.getString(c.getColumnIndexOrThrow("sum"));
+					sumList[Integer.valueOf(month)-1] = Double.valueOf(monthSum);
+				} while (c.moveToNext());
+			}
+		}
+		c.close();
+		return sumList;
+	}
+	
+	 /**
+     * retrieve monthly budget data according to the duration
+     * @param duration
+     * @return
+     */
+	public double[] retrieveMonthlyBudget(int duration){
+		Cursor c;
+		Calendar cal = Calendar.getInstance();
+		int cYear = cal.get(Calendar.YEAR);
+		switch(duration){
+			case ALL_TIME : c = mDb.rawQuery("select strftime(\'%m\', date) as date, sum(amount) as sum from receipt where date(date) <= date('now') AND category = 'Budget' group by strftime(\'%m\', date)", null); break;
+			default : c = mDb.rawQuery("select strftime(\'%m\', date) as date, sum(amount) as sum from receipt where date(date) <= date('now') AND category = 'Budget' AND (strftime(\'%Y\', date) = \'" + cYear + "') group by strftime(\'%m\', date)", null); break;
+		}
+		double[] sumList = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+			
+		if (c != null) {
+			if (c.moveToFirst()) {
+				do {
+					String month = c.getString(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_DATE));
+					String monthSum = c.getString(c.getColumnIndexOrThrow("sum"));
+					sumList[Integer.valueOf(month)-1] = Double.valueOf(monthSum);
+				} while (c.moveToNext());
+			}
+		}
+		c.close();
+		return sumList;
+	}
+	
 	/**
      * find the matching category for given description
      * @param duration
