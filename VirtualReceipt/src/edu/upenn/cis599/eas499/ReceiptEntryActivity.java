@@ -808,6 +808,9 @@ public class ReceiptEntryActivity extends Activity {
 							cal.set(Calendar.MONTH, month);
 							cal.set(Calendar.YEAR, year);
 							cal.set(Calendar.DAY_OF_MONTH,day);
+							cal.set(Calendar.HOUR, mDate.getHours());
+							cal.set(Calendar.MINUTE, mDate.getMinutes());
+							cal.set(Calendar.SECOND, mDate.getSeconds());
 							Date tdate = cal.getTime();
 							mDbHelper.createReceipt(description, amount, tdate, category, payment, recurring, mImage, this.cloudStorage);
 						}
@@ -825,6 +828,9 @@ public class ReceiptEntryActivity extends Activity {
 							cal.set(Calendar.MONTH, month);
 							cal.set(Calendar.YEAR, year);
 							cal.set(Calendar.DAY_OF_MONTH,day);
+							cal.set(Calendar.HOUR, mDate.getHours());
+							cal.set(Calendar.MINUTE, mDate.getMinutes());
+							cal.set(Calendar.SECOND, mDate.getSeconds());
 							Date tdate = cal.getTime();
 							mDbHelper.createReceipt(description, amount, tdate, category, payment, recurring, mImage, this.cloudStorage);
 						}
@@ -852,6 +858,9 @@ public class ReceiptEntryActivity extends Activity {
 							cal.set(Calendar.MONTH, month);
 							cal.set(Calendar.YEAR, year);
 							cal.set(Calendar.DAY_OF_MONTH,day);
+							cal.set(Calendar.HOUR, mDate.getHours());
+							cal.set(Calendar.MINUTE, mDate.getMinutes());
+							cal.set(Calendar.SECOND, mDate.getSeconds());
 							Date tdate = cal.getTime();
 							mDbHelper.createReceipt(description, amount, tdate, category, payment, recurring, mImage, this.cloudStorage);
 						}
@@ -870,6 +879,9 @@ public class ReceiptEntryActivity extends Activity {
 							cal.set(Calendar.MONTH, month);
 							cal.set(Calendar.YEAR, year);
 							cal.set(Calendar.DAY_OF_MONTH,day);
+							cal.set(Calendar.HOUR, mDate.getHours());
+							cal.set(Calendar.MINUTE, mDate.getMinutes());
+							cal.set(Calendar.SECOND, mDate.getSeconds());
 							Date tdate = cal.getTime();
 							mDbHelper.createReceipt(description, amount, tdate, category, payment, recurring, mImage, this.cloudStorage);
 						}
@@ -928,6 +940,9 @@ public class ReceiptEntryActivity extends Activity {
 						cal.set(Calendar.MONTH, month);
 						cal.set(Calendar.YEAR, year);
 						cal.set(Calendar.DAY_OF_MONTH,day);
+						cal.set(Calendar.HOUR, mDate.getHours());
+						cal.set(Calendar.MINUTE, mDate.getMinutes());
+						cal.set(Calendar.SECOND, mDate.getSeconds());
 						Date tdate = cal.getTime();
 						mDbHelper.createReceipt(description, amount, tdate, category, 0, recurring, null, false);
 					}
