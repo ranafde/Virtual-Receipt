@@ -4,6 +4,7 @@
 package edu.upenn.cis599.charts;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.chart.BarChart.Type;
@@ -130,11 +131,22 @@ public class BarChart extends MyChartHelper {
 		input[0] = incomeRenderer;
 		input[1] = expenseRenderer;
 		input[2] = budgetRenderer;
-		
-		 
 				
+		double maxY = 0;
+		
 		multiRenderer = addMutlipleRenderer(input);
-
+		Arrays.sort(monthlyIncome);
+		Arrays.sort(monthlyExpenses);
+		Arrays.sort(monthlyBudget);
+		
+		double[] maxYValues = new double[3];
+		maxYValues[0] = monthlyIncome[monthlyIncome.length-1];
+		maxYValues[1] = monthlyExpenses[monthlyExpenses.length-1];
+		maxYValues[2] = monthlyBudget[monthlyBudget.length-1];
+		
+		Arrays.sort(maxYValues);
+		multiRenderer.setYAxisMax(maxYValues[maxYValues.length-1]);
+		
 		// Creating an intent to plot bar chart using dataset and multipleRenderer
 		Intent intent = ChartFactory.getBarChartIntent(context, dataset, multiRenderer, Type.DEFAULT); 
 		return intent;
