@@ -165,8 +165,8 @@ public class ReceiptDbAdapter {
     public Cursor fetchAllReceipts() {
     	// modified//
     	//return mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_IMAGE}, null, null, null, null, null);
-    	//return mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_RECURRING, KEY_IMAGE, KEY_FLAG}, null, null, null, null, null);
-    	return mDb.rawQuery("select _id, description, amount, date, category, payment, recurring, image, flag from Receipt where date(date) <= date('now')", null);
+    	return mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_RECURRING, KEY_IMAGE, KEY_FLAG},"date(date) <= date('now')", null, null, null, null);
+    	//return mDb.rawQuery("select _id, description, amount, date, category, payment, recurring, image, flag from Receipt where date(date) <= date('now')", null, null, null, null, null);
     }
     
     /**
