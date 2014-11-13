@@ -27,7 +27,7 @@ import android.widget.SimpleAdapter;
 public class StatisticsViewerActivity extends ListActivity {
 	/* initalization should be done in constructor */
 	private MyChartInterface[] mCharts = new MyChartInterface[] {
-			new PieChartCategory(), new LineChart(), new PieChartPayment(), new BarGraphIncomeExpenditure() };
+			new PieChartCategory(), new LineChart(), new PieChartPayment(), new BarChart()};
 
 	private String[] mMenuText;
 
@@ -81,6 +81,12 @@ public class StatisticsViewerActivity extends ListActivity {
 			intent = mCharts[position - 1].execute(this);
 			Log.d(TAG, "position: " + position + " intent name:"+mCharts[position-1].getName());
 		} 
+		
+		else if(position == 4){
+			intent = mCharts[position - 1].execute(this);
+			Log.d(TAG, "position: " + position + " intent name:"+mCharts[position-1].getName());
+		}
+		
 		else {
 			intent = new Intent(getApplicationContext(),
 					ChartViewerActivity.class);

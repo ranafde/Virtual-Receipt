@@ -13,16 +13,18 @@ import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
 import edu.upenn.cis599.eas499.ReceiptDbAdapter;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint.Align;
+import android.util.Log;
 
 /**
  * Monthly spending demo chart.
  */
 public class LineChart extends MyChartHelper {
+	
+	public static final String TAG = "LineChart.java";
 	/**
 	 * Returns the chart name.
 	 * 
@@ -76,6 +78,7 @@ public class LineChart extends MyChartHelper {
 		Intent intent = ChartFactory.getLineChartIntent(context,
 				buildDataset(titles, months, monthlySpendingValues), renderer,
 				"Monthly Spending");
+		Log.v(TAG,"in execute of Line chart");
 		return intent;
 	}
 

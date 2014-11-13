@@ -8,13 +8,13 @@ import org.achartengine.ChartFactory;
 import org.achartengine.chart.BarChart;
 
 import edu.upenn.cis599.R;
-import edu.upenn.cis599.charts.BarGraphIncomeExpenditure;
+//import edu.upenn.cis599.charts.BarGraphIncomeExpenditure;
 import edu.upenn.cis599.charts.PieChartCategory;
 import edu.upenn.cis599.charts.PieChartPayment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.GestureDetector;
+import android.view.GestureDetector; 
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
