@@ -85,7 +85,7 @@
             android:text="@string/category" />
 
         <Spinner
-            android:id="@+id/category"
+            android:id="@+id/categoryIncome"
             style="@style/ButtonText"
             android:layout_width="280dp"
             android:layout_height="80dp"
