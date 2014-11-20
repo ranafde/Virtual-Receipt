@@ -165,8 +165,10 @@ public class ReceiptEntryActivity extends Activity {
 			/* initialize categoryList as follows */
 			if(categoryList == null){
 				categoryList = new ArrayList<String>(Arrays.asList("Education","Grocery","Clothing", "Rent", "Bill", "Restaurant", "Recreation", "Others"));
+
 			}
-			Log.v(TAG, "Entering ReceiptEntryActivity");
+			
+			Log.v(TAG, "Entering ReceiptEntryActivity. okay.");
 
 			// Setting up Tesseract
 			if(_path == null && trainData == null)
@@ -559,10 +561,13 @@ public class ReceiptEntryActivity extends Activity {
 
 	private void populateSpinner() {
 		ArrayList<String> sortedList = mDbHelper.sortByCategory();
+		System.out.println("sortedList "+sortedList);
+		
 		ArrayList<String> temp = new ArrayList<String>();
 
 		String matchingCategory = mDbHelper.findMatchingCategory(mDescriptionText.getText().toString());
-		if(matchingCategory != null){
+		System.out.println("matching category " + matchingCategory);
+		if(matchingCategory != null && !"Income".equals(matchingCategory) && !"Budget".equals(matchingCategory)){
 			temp.add(matchingCategory);
 			for(String category : sortedList){
 				if(!category.equals(matchingCategory))
@@ -575,6 +580,7 @@ public class ReceiptEntryActivity extends Activity {
 		for(String category : categoryList){
 			if(categoryList.contains(category) && !temp.contains(category))
 				temp.add(category);
+//			System.out.println(temp);
 		}
 		categoryList = temp;
 		String[] items = categoryList.toArray(new String[categoryList.size()]);
@@ -591,11 +597,11 @@ public class ReceiptEntryActivity extends Activity {
 		Log.e(TAG,"Database has been accessed - income");
 
 		String[] items = categoryListIncome.toArray(new String[categoryListIncome.size()]);
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items);
+		adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-		mCategoryText = (Spinner) findViewById(R.id.category);
-		mCategoryText.setAdapter(adapter);
+		mCategoryText = (Spinner) findViewById(R.id.categoryIncome);
+		mCategoryText.setAdapter(adapter1);
 	}
 
 	private void updateDate() {
@@ -950,7 +956,7 @@ public class ReceiptEntryActivity extends Activity {
 				if (id > 0) {
 					mRowId = id;
 				}
-				Toast.makeText(this, "Income successfully added", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "Income successfully added!", Toast.LENGTH_SHORT).show();
 			} 
 			setResult(RESULT_OK);
 			finish();
