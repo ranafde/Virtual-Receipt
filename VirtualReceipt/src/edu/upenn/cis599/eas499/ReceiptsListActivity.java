@@ -41,9 +41,8 @@ public class ReceiptsListActivity extends ListActivity {
 	private void fillData() {
 		mReceiptCursor = mDbHelper.fetchAllReceipts();
 		startManagingCursor(mReceiptCursor);
-
-		String[] from = new String[] { ReceiptDbAdapter.KEY_DESCRIPTION };
-		int[] to = new int[] { R.id.receipt_text };
+		String[] from = new String[] {ReceiptDbAdapter.KEY_DESCRIPTION, ReceiptDbAdapter.KEY_DATE, ReceiptDbAdapter.KEY_AMOUNT};
+		int[] to = new int[] { R.id.receipt_text, R.id.receipt_date, R.id.receipt_amount};
 		
 		setContentView(R.layout.main);
 		//Edited by Xiaolu
