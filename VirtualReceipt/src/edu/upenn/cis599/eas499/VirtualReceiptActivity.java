@@ -26,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class VirtualReceiptActivity extends Activity {
 	private ReceiptDbAdapter mDbHelper;
@@ -94,28 +95,33 @@ public class VirtualReceiptActivity extends Activity {
     			intent = new Intent(p, ReceiptEntryActivity.class);
     			intent.putExtra("Income","Yes");
     			Log.d(TAG,"add an income virtual receipt activity");
+    			Toast.makeText(getApplicationContext(), R.string.add_income_Toast, Toast.LENGTH_LONG).show();
     			startActivity(intent);
     		}
 			/* Add Expense */
 			else if (label.equals(getResources().getString(R.string.add_receipt))) {
     			intent = new Intent(p, ReceiptEntryActivity.class);
     			intent.putExtra("Income","No");
+    			Toast.makeText(getApplicationContext(), R.string.add_receipt_Toast, Toast.LENGTH_LONG).show();
     			startActivity(intent);
     		}
 			/* View Entries */
     		else if (label.equals(getResources().getString(R.string.view_receipt))) {
     			intent = new Intent(p, ReceiptsListActivity.class);
+    			Toast.makeText(getApplicationContext(), R.string.view_receipt_Toast, Toast.LENGTH_LONG).show();
     			startActivity(intent);
     		}
 			/*  View spending statistics */
     		else if (label.equals(getResources().getString(R.string.spending_stats))) {
     			intent = new Intent(p, StatisticsViewerActivity.class);
+    			Toast.makeText(getApplicationContext(), R.string.spending_stats_Toast, Toast.LENGTH_LONG).show();
     			startActivity(intent);
     		}
     		/* Sync with dropbox */
     		else if (label.equals(getResources().getString(R.string.dropbox))) {
     			/*Yiran Qin Dropbox activity to handle all front-end data sharing feature*/
     			intent = new Intent(p, DropboxActivity.class);
+    			Toast.makeText(getApplicationContext(), R.string.dropbox_Toast, Toast.LENGTH_LONG).show();
     			startActivity(intent);
     		}
 		}
