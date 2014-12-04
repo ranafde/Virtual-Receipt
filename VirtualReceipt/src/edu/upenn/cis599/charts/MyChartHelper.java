@@ -79,10 +79,10 @@ public abstract class MyChartHelper implements MyChartInterface {
 
 	protected void setRenderer(XYMultipleSeriesRenderer renderer, int[] colors,
 			PointStyle[] pointStyles) {
-		renderer.setAxisTitleTextSize(10);
+		renderer.setAxisTitleTextSize(40);
 		renderer.setChartTitleTextSize(15);
-		renderer.setLabelsTextSize(10);
-		renderer.setLegendTextSize(10);
+		renderer.setLabelsTextSize(18);
+		renderer.setLegendTextSize(40);
 		renderer.setPointSize(5f);
 		renderer.setMargins(new int[] { 20, 30, 15, 20 });
 		int length = colors.length;
@@ -158,8 +158,8 @@ public abstract class MyChartHelper implements MyChartInterface {
 		List<Integer> colors = getUniqueColors(numColors);
 		Log.v("Colors", colors.size() + "");
 		DefaultRenderer renderer = new DefaultRenderer();
-		renderer.setLabelsTextSize(10);
-		renderer.setLegendTextSize(10);
+		renderer.setLabelsTextSize(18);
+		renderer.setLegendTextSize(20);
 		renderer.setMargins(new int[] { 20, 30, 15, 0 });
 		for (int color : colors) {
 			SimpleSeriesRenderer simpleSeriesRenderer = new SimpleSeriesRenderer();

@@ -109,8 +109,8 @@ public class LineChart extends MyChartHelper {
 		renderer.setXLabelsAlign(Align.CENTER);
 		renderer.setYLabelsAlign(Align.CENTER);
 		// legends and labels size
-		renderer.setLegendTextSize(15);
-		renderer.setLabelsTextSize(10);
+		renderer.setLegendTextSize(30);
+		renderer.setLabelsTextSize(18);
 		renderer.setLegendHeight(120);
 		renderer.setPanLimits(new double[] { 1, 12, 0, 30000 });
 		renderer.setZoomLimits(new double[] { 1, 12, 0, 30000 });

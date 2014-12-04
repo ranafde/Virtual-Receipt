@@ -111,16 +111,18 @@ public class PieChartPayment extends MyChartHelper {
 		case 1:
 			renderer.setZoomButtonsVisible(true);
 			renderer.setZoomEnabled(true);
-			renderer.setChartTitleTextSize(15);
+			renderer.setChartTitleTextSize(30);
+			renderer.setLabelsTextSize(40);
+			renderer.setLegendTextSize(40);
 		case 2:
-			renderer.setChartTitleTextSize(20);
+			renderer.setChartTitleTextSize(50);
 			renderer.setPanEnabled(false);
 			renderer.setZoomEnabled(false);
 			renderer.setShowLabels(true);
 			renderer.setDisplayValues(true);
 			renderer.setStartAngle(45);
-			renderer.setLabelsTextSize(15);
-			renderer.setLegendTextSize(15);
+			renderer.setLabelsTextSize(40);
+			renderer.setLegendTextSize(40);
 			// Set the color gradient and highlight the first slice.
 			for (int i = 0; i < renderer.getSeriesRendererCount(); i++) {
 				SimpleSeriesRenderer simpleSeriesRenderer = renderer
