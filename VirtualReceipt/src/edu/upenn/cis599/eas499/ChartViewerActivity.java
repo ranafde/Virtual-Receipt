@@ -35,6 +35,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 /**
@@ -259,6 +260,7 @@ public class ChartViewerActivity extends Activity {
 			e.printStackTrace();
 		} finally {
 			document.close();
+			Toast.makeText(getApplicationContext(), "Saved PDF file on the phone", Toast.LENGTH_LONG).show();
 		}
 		//deleteFile(storageDirectory + imageFiles + ".png");
 		File file = new File(storageDirectory + imageFiles + ".png");
