@@ -170,7 +170,7 @@ public class BarChart extends MyChartHelper {
 		 * Customizing graphs
 		 */
 		//setting text size of the title
-		multiRenderer.setChartTitleTextSize(28);
+		multiRenderer.setChartTitleTextSize(30);
 		//setting text size of the axis title
 		multiRenderer.setAxisTitleTextSize(24);
 		//setting text size of the graph lable
@@ -201,6 +201,10 @@ public class BarChart extends MyChartHelper {
 		multiRenderer.setInScroll(false);
 		//setting to set legend height of the graph
 		multiRenderer.setLegendHeight(30);
+		// let legend take the space it needs exactly
+		multiRenderer.setFitLegend(true);
+		// setting to set legend text size of the graph
+		multiRenderer.setLegendTextSize(30);
 		//setting x axis label align
 		multiRenderer.setXLabelsAlign(Align.CENTER);
 		//setting y axis label to align
