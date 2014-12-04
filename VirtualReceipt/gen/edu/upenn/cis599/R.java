@@ -137,7 +137,9 @@ public final class R {
     public static final class string {
         public static final int add=0x7f06002d;
         public static final int add_income=0x7f06002f;
+        public static final int add_income_Toast=0x7f060030;
         public static final int add_receipt=0x7f060005;
+        public static final int add_receipt_Toast=0x7f060031;
         public static final int add_values=0x7f06002a;
         public static final int amount=0x7f06000b;
         public static final int app_name=0x7f060002;
@@ -159,6 +161,7 @@ public final class R {
         public static final int description=0x7f06000a;
         public static final int done=0x7f060019;
         public static final int dropbox=0x7f060008;
+        public static final int dropbox_Toast=0x7f060034;
         public static final int edit_category=0x7f060022;
         /**  Added by Xiaolu 
          */
@@ -181,8 +184,10 @@ public final class R {
         public static final int save=0x7f060015;
         public static final int spaceholder=0x7f060001;
         public static final int spending_stats=0x7f060007;
+        public static final int spending_stats_Toast=0x7f060033;
         public static final int view_image=0x7f060017;
         public static final int view_receipt=0x7f060006;
+        public static final int view_receipt_Toast=0x7f060032;
         public static final int x=0x7f06002b;
         public static final int y=0x7f06002c;
     }

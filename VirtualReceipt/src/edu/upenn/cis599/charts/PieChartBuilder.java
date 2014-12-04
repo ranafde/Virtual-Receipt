@@ -71,9 +71,9 @@ public class PieChartBuilder extends Activity {
 	private void setDefaultRenderer(DefaultRenderer mDefaultRenderer){
 		mDefaultRenderer.setApplyBackgroundColor(true);
 		mDefaultRenderer.setBackgroundColor(Color.argb(100, 50, 50, 50));
-		mDefaultRenderer.setChartTitleTextSize(15);
-		mDefaultRenderer.setLabelsTextSize(10);
-		mDefaultRenderer.setLegendTextSize(10);
+		mDefaultRenderer.setChartTitleTextSize(30);
+		mDefaultRenderer.setLabelsTextSize(38);
+		mDefaultRenderer.setLegendTextSize(40);
 		mDefaultRenderer.setMargins(new int[] { 20, 30, 15, 0 });
 		mDefaultRenderer.setZoomButtonsVisible(true);
 		mDefaultRenderer.setStartAngle(90);

@@ -112,7 +112,9 @@ int layout statistics_header 0x7f03000f
 int layout xy_chart 0x7f030010
 int string add 0x7f06002d
 int string add_income 0x7f06002f
+int string add_income_Toast 0x7f060030
 int string add_receipt 0x7f060005
+int string add_receipt_Toast 0x7f060031
 int string add_values 0x7f06002a
 int string amount 0x7f06000b
 int string app_name 0x7f060002
@@ -134,6 +136,7 @@ int string delete 0x7f060018
 int string description 0x7f06000a
 int string done 0x7f060019
 int string dropbox 0x7f060008
+int string dropbox_Toast 0x7f060034
 int string edit_category 0x7f060022
 int string logo 0x7f060000
 int string menu_delete 0x7f060020
@@ -154,8 +157,10 @@ int string reselect 0x7f06001a
 int string save 0x7f060015
 int string spaceholder 0x7f060001
 int string spending_stats 0x7f060007
+int string spending_stats_Toast 0x7f060033
 int string view_image 0x7f060017
 int string view_receipt 0x7f060006
+int string view_receipt_Toast 0x7f060032
 int string x 0x7f06002b
 int string y 0x7f06002c
 int style ButtonText 0x7f080001

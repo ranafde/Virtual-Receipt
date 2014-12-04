@@ -132,7 +132,9 @@ public class PieChartCategory extends MyChartHelper {
 			break;
 		}
 		renderer.setChartTitle(chartTitle);
-		// renderer.setChartTitleTextSize(30);
+		renderer.setChartTitleTextSize(50);
+		renderer.setLegendTextSize(40);
+		renderer.setLabelsTextSize(40);
 
 		mDbHelper.close();
 		return ChartFactory.getPieChartView(context,
