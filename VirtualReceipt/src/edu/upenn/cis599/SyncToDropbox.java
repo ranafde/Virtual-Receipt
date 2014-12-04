@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
@@ -43,7 +44,7 @@ public class SyncToDropbox extends AsyncTask<Void, Long, Boolean> {
     private Context mContext;
     private final ProgressDialog mDialog;
 
-    private String mErrorMsg;   
+    private String mErrorMsg;
 
 
     public SyncToDropbox(Context context, DropboxAPI<?> api, String dropboxPath,

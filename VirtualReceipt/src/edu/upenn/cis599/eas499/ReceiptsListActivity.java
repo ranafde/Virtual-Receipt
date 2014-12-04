@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 public class ReceiptsListActivity extends ListActivity {
 	private static final int ACTIVITY_CREATE=0;
@@ -44,7 +45,7 @@ public class ReceiptsListActivity extends ListActivity {
 		String[] from = new String[] {ReceiptDbAdapter.KEY_DESCRIPTION, ReceiptDbAdapter.KEY_DATE, ReceiptDbAdapter.KEY_AMOUNT};
 		int[] to = new int[] { R.id.receipt_text, R.id.receipt_date, R.id.receipt_amount};
 		
-		setContentView(R.layout.main);
+		setContentView(R.layout.receipt_list);
 		//Edited by Xiaolu
 		ListView lv = getListView();
 		View header = (View)getLayoutInflater().inflate(R.layout.receipt_header, null);
@@ -118,5 +119,13 @@ public class ReceiptsListActivity extends ListActivity {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 	    super.onConfigurationChanged(newConfig);
+	}
+	
+	public void exportToPDF(View v) {
+		mDbHelper = new ReceiptDbAdapter(this);
+		mDbHelper.open();
+        mDbHelper.exportReceiptsToPDF();
+        mDbHelper.close();
+        Toast.makeText(getApplicationContext(), "Saved PDF file on the phone", Toast.LENGTH_LONG).show();
 	}
 }

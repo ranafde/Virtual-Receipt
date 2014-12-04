@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Done by Xiaolu -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/background"
+    android:orientation="vertical"
+    tools:context=".eas499.ReceiptsListActivity" >
+
+    <!--
+        <ImageView
+        android:id="@+id/logo"
+        android:contentDescription="@string/logo"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="center_vertical"
+        android:maxHeight="30dp"
+        android:maxWidth="20dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/logo"
+        android:visibility="visible" >
+        </ImageView>
+    -->
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="395dp"
+        android:layout_marginBottom="30dp"
+        android:cacheColorHint="#00000000"
+        android:gravity="center" >
+    </ListView>
+
+    <Button
+        android:id="@+id/export_pdf"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal|center"
+        android:onClick="exportToPDF"
+        android:text="Export Receipts to PDF" />
+
+</LinearLayout>

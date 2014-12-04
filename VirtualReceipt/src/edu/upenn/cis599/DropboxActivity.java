@@ -15,6 +15,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -63,7 +64,8 @@ public class DropboxActivity extends Activity {
     final static private String ACCOUNT_PREFS_NAME = "prefs";
     final static private String ACCESS_KEY_NAME = "ACCESS_KEY";
     final static private String ACCESS_SECRET_NAME = "ACCESS_SECRET";
-
+    private static final String DATA_PATH = Environment
+			.getExternalStorageDirectory().toString() + "/VirtualReceipt/";
     // public static by charles 11.20
     DropboxAPI<AndroidAuthSession> mApi;
 
@@ -111,7 +113,9 @@ public class DropboxActivity extends Activity {
 
         mUpload.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-            	ArrayList<File> files = null;
+            	File dir = new File(DATA_PATH);
+            	File[] files = dir.listFiles();
+            	//ArrayList<File> files = null;
             	try{
             		ReceiptDbAdapter mDbHelper = new ReceiptDbAdapter(getApplicationContext());
             		mDbHelper.open();
@@ -122,11 +126,14 @@ public class DropboxActivity extends Activity {
             		mDbHelper.close();
             		
             		SyncToDropbox upload = new SyncToDropbox(DropboxActivity.this, mApi, DATA_DIR, file);
-            		/*for (File file : files) {
-                  		SyncToDropbox upload = new SyncToDropbox(DropboxActivity.this, mApi, DATA_DIR, file);
-                		upload.execute();
-            		}*/
             		upload.execute();
+            		for (File f : files) {
+            		   if(f.getName().endsWith(".pdf")){
+	                  		upload = new SyncToDropbox(DropboxActivity.this, mApi, DATA_DIR, f);
+	                		upload.execute();
+                		}
+            		}
+            		
             		
             	}catch(IOException ex){
             		showToast("Failed to write to file");

@@ -27,8 +27,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.Map.Entry;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import edu.upenn.cis599.R;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -36,10 +41,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Color;
 import android.os.Environment;
-import android.text.format.DateFormat;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Database access helper class.
@@ -63,7 +67,8 @@ public class ReceiptDbAdapter {
     private static final String TAG = "ReceiptDbAdapter";
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
-	
+    
+    
     /**
      * Database creation sql statement
      */
@@ -89,6 +94,19 @@ public class ReceiptDbAdapter {
     private static final String DATA_PATH = Environment
 			.getExternalStorageDirectory().toString() + "/VirtualReceipt/";
 	private static final String FILE_PATH = DATA_PATH + "data.txt";
+	
+	private static final String PDF_FILE = DATA_PATH + "ReciptsReport.pdf";
+	
+	private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
+  	      Font.BOLD);
+	private static Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN, 36,
+  	      Font.NORMAL, BaseColor.BLUE);
+	private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
+  	      Font.BOLD);
+	private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
+  	      Font.BOLD);
+	
+	
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -478,85 +496,6 @@ public class ReceiptDbAdapter {
     }
 	
 	/**
-	 * update the database entries so that only the entries with date on current month can preserve its blob data, otherwise that data type is deleted from that entry
-	 */
-	public void updateBlobFields(){
-		Cursor c = mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_RECURRING, KEY_IMAGE}, null, null, null, null, null);
-		
-		Calendar cal = Calendar.getInstance();
-		int cYear = cal.get(Calendar.YEAR);
-		int cMonth = cal.get(Calendar.MONTH);
-		ArrayList<ContentValues> updateList = new ArrayList<ContentValues>();
-		ArrayList<Integer> deleteList = new ArrayList<Integer>();
-		String description;
-		double amount;
-		Date date;
-		String category;
-		int payment;
-		boolean recurring;
-		int rowId;
-
-		if (c != null) {
-			if (c.moveToFirst()) {
-				do {
-					try { 
-						String tempDate = c.getString(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_DATE));
-						Log.v("Date", tempDate);
-						
-						SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-						date = (Date)formatter.parse(tempDate);
-						Calendar tempCal=Calendar.getInstance();
-						tempCal.setTime(date);
-						
-						if(tempCal.get(Calendar.YEAR) < cYear || (tempCal.get(Calendar.YEAR) == cYear && tempCal.get(Calendar.MONTH) < cMonth)){
-							Log.v("Former Year or Month Date", tempDate);
-							
-							description = c.getString(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_DESCRIPTION));
-							amount = c.getDouble(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_AMOUNT));
-							category = c.getString(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_CATEGORY));
-							payment = c.getInt(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_PAYMENT));
-							recurring = (c.getInt(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_RECURRING)) == 1);
-							rowId = c.getInt(c.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_ROWID));
-							deleteList.add(rowId);
-							
-							ContentValues updatedValues = new ContentValues();
-					    	updatedValues.put(KEY_DESCRIPTION, description);
-					    	updatedValues.put(KEY_AMOUNT, amount);
-					    	updatedValues.put(KEY_DATE, new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(date));
-					    	updatedValues.put(KEY_CATEGORY, category);
-					    	updatedValues.put(KEY_RECURRING, recurring);
-					    	updatedValues.put(KEY_PAYMENT, payment);
-							
-					    	updateList.add(updatedValues);
-						}						
-					}
-					catch(Exception e){
-						Log.v("Database Update", "Error Store Information");
-					}
-				} while (c.moveToNext());
-			}
-		}
-		c.close();
-		/*try to delete the record with blob data not belong to current month*/
-		try{
-			for(int id : deleteList){
-				if(!deleteReceipt(id))
-					Log.v("Database Update", "Error delete old entries");
-			}
-		}catch(Exception e){
-			Log.v("Database Update", "Error delete old entries");
-		}
-		/*try to insert the older record back without blob data*/
-		try{
-			for(ContentValues updatedValues : updateList){
-				mDb.insert(DATABASE_TABLE_RECEIPT, null, updatedValues);
-			}
-		}catch(Exception e){
-			Log.v("Database Update", "Error re-insert entries");
-		}
-	}
-	
-	/**
 	 * write the local database data into a file and upload into dropbox 
 	 * @return the local copy of file 
 	 * @throws IOException
@@ -644,6 +583,212 @@ public class ReceiptDbAdapter {
 
 		return result;
 	}
+	
+	public void exportReceiptsToPDF(){
+	    Calendar c = Calendar.getInstance(); 
+	    int currentYear = c.get(Calendar.YEAR);
+	    int currentMonth = c.get(Calendar.MONTH);
+	    
+	    String[] months = {"January", "February", "March", "April", "May", "June",
+				"July", "August", "September", "October", "November", "December"};
+	    
+		try{
+			Document document = new Document();
+		    PdfWriter.getInstance(document, new FileOutputStream(PDF_FILE));
+		    document.open();
+		    
+		    // Meta Data
+		    document.addTitle("Virtual Receipt Summary Report");
+		    document.addAuthor("Virtual Receipt Android App");
+		    
+		    // Title
+		    Paragraph preface = new Paragraph();
+		    addEmptyLine(preface, 1);
+		    preface.add(new Paragraph("Virtual Receipt Summary Report", titleFont));
+		    addEmptyLine(preface, 1);
+		    preface.add(new Paragraph("Report generated by: Virtual Receipt Android App, " + new Date(), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		            smallBold));
+		    addEmptyLine(preface, 5);
+		    preface.add(new Paragraph("This document summarizes all the receipts saved in virtual receipt app",
+		            smallBold));
+		    document.add(preface);
+		    
+	    // First Section
+		    Anchor anchor = new Anchor("Income Summary", catFont);
+		    anchor.setName("Income Summary");
+		    Chapter catPart = new Chapter(new Paragraph(anchor), 1);
+		    
+		    // 1.1
+		    Paragraph subPara = new Paragraph("All Income Summary", subFont);
+		    Section subCatPart = catPart.addSection(subPara);
+		    Paragraph paragraph = new Paragraph("This table summarizes all income month-wise");
+		    addEmptyLine(paragraph, 2);
+		    subCatPart.add(paragraph);
+		    double[] allincome = retrieveMonthlyIncome(2);
+		    createTable(subCatPart, months, allincome, "Month", "Total Income");	
+
+		    
+		    // 1.2	    
+		    subPara = new Paragraph("Income Summary for " + String.valueOf(currentYear), subFont);
+		    subCatPart = catPart.addSection(subPara);
+		    paragraph = new Paragraph("This table summarizes current year income month-wise");
+		    addEmptyLine(paragraph, 2);
+		    subCatPart.add(paragraph);
+		    double[] cincome = retrieveMonthlyIncome(1);
+		    createTable(subCatPart, months, cincome, "Month", "Total Income");	    
+		    
+		    document.add(catPart);
+		    document.newPage();
+		    
+		 // Second Section
+		    anchor = new Anchor("Expense Summary", catFont);
+		    anchor.setName("Expense Summary");
+		    catPart = new Chapter(new Paragraph(anchor), 2);
+		    
+		    // 2.1
+		    subPara = new Paragraph("All Expense Summary", subFont);
+		    subCatPart = catPart.addSection(subPara);
+		    paragraph = new Paragraph("This table summarizes all expenses month-wise");
+		    addEmptyLine(paragraph, 2);
+		    subCatPart.add(paragraph);
+		    double[] allexpense = retrieveMonthlyPayment(2);
+		    createTable(subCatPart, months, allexpense, "Month", "Total Expense");	
+		    
+		    // 2.2
+		    subPara = new Paragraph("Expense Summary for " + String.valueOf(currentYear), subFont);
+		    subCatPart = catPart.addSection(subPara);
+		    paragraph = new Paragraph("This table summarizes current year expenses month-wise");
+		    addEmptyLine(paragraph, 2);
+		    subCatPart.add(paragraph);
+		    double[] cexpense = retrieveMonthlyPayment(1);
+		    createTable(subCatPart, months, cexpense, "Month", "Total Expense");	
+		    
+		    document.add(catPart);
+		    document.newPage();
+		    
+		// Third Section
+		    anchor = new Anchor("Category Summary", catFont);
+		    anchor.setName("Category Summary");
+		    catPart = new Chapter(new Paragraph(anchor), 3);
+		    
+		    // 3.1
+		    subPara = new Paragraph("All Category Summary", subFont);
+		    subCatPart = catPart.addSection(subPara);
+		    paragraph = new Paragraph("This table summarizes all category expenses all time");
+		    addEmptyLine(paragraph, 2);
+		    subCatPart.add(paragraph);
+		    HashMap<String, Double> allcat = retrieveDataByCategory(2);
+		    String[] categories = allcat.keySet().toArray(new String[allcat.keySet().size()]);
+		    double[] exp = new double[categories.length];
+		    int i = 0;
+		    for (String key: categories) {
+		    	exp[i] = allcat.get(key);
+		        i++;
+		    }
+		    createTable(subCatPart, categories, exp, "Category", "Total Expense");	
+		    
+		    // 3.2
+		    subPara = new Paragraph("Category Summary for " + String.valueOf(currentYear), subFont);
+		    subCatPart = catPart.addSection(subPara);
+		    paragraph = new Paragraph("This table summarizes all category expenses for current year");
+		    addEmptyLine(paragraph, 2);
+		    subCatPart.add(paragraph);
+		    HashMap<String, Double> cycat = retrieveDataByCategory(1);
+		    categories = cycat.keySet().toArray(new String[cycat.keySet().size()]);
+		    exp = new double[categories.length];
+		    i = 0;
+		    for (String key: categories) {
+		    	exp[i] = allcat.get(key);
+		        i++;
+		    }
+		    
+		    createTable(subCatPart, categories, exp, "Category", "Total Expense");	
+		    
+		    // 3.3
+		    subPara = new Paragraph("Category Summary for " + months[currentMonth], subFont);
+		    subCatPart = catPart.addSection(subPara);
+		    paragraph = new Paragraph("This table summarizes all category expenses for current month");
+		    addEmptyLine(paragraph, 2);
+		    subCatPart.add(paragraph);
+		    HashMap<String, Double> cmcat = retrieveDataByCategory(0);
+		    categories = cmcat.keySet().toArray(new String[cmcat.keySet().size()]);
+		    exp = new double[categories.length];
+		    i = 0;
+		    for (String key: categories) {
+		    	exp[i] = allcat.get(key);
+		        i++;
+		    }
+		    
+		    createTable(subCatPart, categories, exp, "Category", "Total Expense");	
+		    
+		    document.add(catPart);
+		    document.newPage();
+		    
+		 // Fourth Section
+		    anchor = new Anchor("All Receipts", catFont);
+		    anchor.setName("All Receipts");
+		    catPart = new Chapter(new Paragraph(anchor), 4);		    
+		    
+		    Cursor cur = mDb.query(DATABASE_TABLE_RECEIPT, new String[] {KEY_ROWID, KEY_DESCRIPTION, KEY_AMOUNT, KEY_DATE, KEY_CATEGORY, KEY_PAYMENT, KEY_RECURRING, KEY_IMAGE}, null, null, null, null, null);
+			
+					
+			if (cur != null) {
+				if (cur.moveToFirst()) {
+					do {
+						StringBuffer buffer = new StringBuffer();
+						buffer.append("Description: ");
+						buffer.append(cur.getString(cur.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_DESCRIPTION)));
+						buffer.append("\nAmount: ");
+						buffer.append(cur.getDouble(cur.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_AMOUNT)));
+						buffer.append("\nDate: ");
+						buffer.append(cur.getString(cur.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_DATE)));
+						buffer.append("\nCategory: ");
+						buffer.append(cur.getString(cur.getColumnIndexOrThrow(ReceiptDbAdapter.KEY_CATEGORY)));
+						buffer.append("\n\n");
+						
+						Paragraph par = new Paragraph(buffer.toString());
+						catPart.add(par);
+					} while (cur.moveToNext());
+				}
+			}
+			cur.close();
+		    
+		    document.add(catPart);
+		    document.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	private void addEmptyLine(Paragraph paragraph, int number) {
+	    for (int i = 0; i < number; i++) {
+	      paragraph.add(new Paragraph(" "));
+	    }
+	  }
+	
+	private void createTable(Section subCatPart, String[] keys, double[] values, String header1, String header2)
+		      throws BadElementException {
+		    PdfPTable table = new PdfPTable(2);
+
+		    PdfPCell c1 = new PdfPCell(new Phrase(header1));
+		    c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		    table.addCell(c1);
+
+		    c1 = new PdfPCell(new Phrase(header2));
+		    c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		    table.addCell(c1);
+		    
+		    table.setHeaderRows(1);
+		    
+		    for(int i = 0; i < keys.length; i++){
+			    table.addCell(keys[i]);
+			    table.addCell(String.valueOf(values[i]));
+		    }
+
+		    subCatPart.add(table);
+
+		  }
 	
 	/**
 	 * synchronize the Database with the file downloaded from dropbox 
