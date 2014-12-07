@@ -128,4 +128,8 @@ public class ReceiptsListActivity extends ListActivity {
         mDbHelper.close();
         Toast.makeText(getApplicationContext(), "Saved PDF file on the phone", Toast.LENGTH_LONG).show();
 	}
+	
+	public void onInfoButtonClick(View view){
+		Toast.makeText(getApplicationContext(), R.string.view_receipt_Toast, Toast.LENGTH_LONG).show();
+	}
 }

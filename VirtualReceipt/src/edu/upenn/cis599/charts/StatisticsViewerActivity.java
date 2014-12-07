@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 /**
  * 
@@ -94,4 +95,5 @@ public class StatisticsViewerActivity extends ListActivity {
 		}
 		startActivity(intent);
 	}
+	
 }

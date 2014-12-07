@@ -15,6 +15,15 @@
         android:layout_marginBottom="20dp"
         android:contentDescription="@string/logo"
         android:src="@drawable/dropbox" />
+
+    <Button
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button"
+        android:layout_gravity="center"
+        android:onClick="onInfoButtonClick"
+        android:text="@string/info_button" />
     
 	<Button
 	    android:id="@+id/auth_button"

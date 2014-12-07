@@ -302,4 +302,8 @@ public class DropboxActivity extends Activity {
         return session;
     }
     
+	public void onInfoButtonClick(View view){
+		Toast.makeText(getApplicationContext(), R.string.dropbox_Toast, Toast.LENGTH_LONG).show();
+	}
+    
 }

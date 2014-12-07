@@ -9,8 +9,7 @@
     <ViewFlipper
         android:id="@+id/view_flipper"
         android:layout_width="match_parent"
-        android:layout_height="434dp"
-        android:layout_weight="2"
+        android:layout_height="368dp"
         android:background="@drawable/background"
         android:onClick="exportPdf"
         android:paddingBottom="10dp"
@@ -60,5 +59,13 @@
         android:layout_marginTop="10dp"
         android:onClick="exportPdf"
         android:text="Export as Pdf" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/swipe"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </LinearLayout>

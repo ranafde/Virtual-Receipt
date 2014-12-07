@@ -645,6 +645,9 @@ public class ReceiptEntryActivity extends Activity {
 		mRecurring.setChecked(true);
 	}
 
+	public void onInfoButtonClick(View view){
+		Toast.makeText(getApplicationContext(), R.string.add_receipt_Toast, Toast.LENGTH_LONG).show();
+	}
 	// modified by charles 11/18
 	public void onSaveButtonClick() {
 		if(! isOthersCategory()){

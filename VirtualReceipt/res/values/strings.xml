@@ -64,5 +64,7 @@
     <string name="view_receipt_Toast">With this option, you can view all the previous entries for income and expenditures incurred</string>
     <string name="spending_stats_Toast">With this option, you can view various statistics for income and expenditue</string>
     <string name="dropbox_Toast">With this option, you can sync your data to your dropbox account</string>
+    <string name="swipe">\u0020 \u0020 \u0020 \u25C0 swipe on the chart for different spending view  \u25B6</string>
+    <string name="info_button">info</string>
 
 </resources>
