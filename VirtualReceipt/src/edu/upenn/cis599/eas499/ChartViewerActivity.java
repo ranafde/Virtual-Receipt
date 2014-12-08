@@ -206,22 +206,22 @@ public class ChartViewerActivity extends Activity {
 			currentYearGraph = (LinearLayout) findViewById(R.id.current_year);
 			allTimeGraph = (LinearLayout) findViewById(R.id.all_time);
 			if (convertGraphToImage(allTimeGraph, imageFiles[2]) != null)
-				addImagesToPdf(imageFiles[2]);
+				return;
 			else if (convertGraphToImage(currentYearGraph, imageFiles[1]) != null)
-				addImagesToPdf(imageFiles[1]);
+				return;
 			else if (convertGraphToImage(currentMonthGraph, imageFiles[0]) != null)
-				addImagesToPdf(imageFiles[0]);
+				return;
 		} else if (selection == 3) {
 			// setCharts(3);
 			currentMonthGraph = (LinearLayout) findViewById(R.id.current_month);
 			currentYearGraph = (LinearLayout) findViewById(R.id.current_year);
 			allTimeGraph = (LinearLayout) findViewById(R.id.all_time);
 			if (convertGraphToImage(allTimeGraph, imageFiles[5]) != null)
-				addImagesToPdf(imageFiles[5]);
+				return;
 			else if (convertGraphToImage(currentYearGraph, imageFiles[4]) != null)
-				addImagesToPdf(imageFiles[4]);
+				return;
 			else if (convertGraphToImage(currentMonthGraph, imageFiles[3]) != null)
-				addImagesToPdf(imageFiles[3]);
+				return;
 		}
 
 	}
@@ -238,11 +238,12 @@ public class ChartViewerActivity extends Activity {
 			return null;
 		}
 		graph.setDrawingCacheEnabled(false);
+		Toast.makeText(getApplicationContext(), "Saved PDF file on the phone", Toast.LENGTH_LONG).show();
 		return "success";
 
 	}
 
-	private void addImagesToPdf(String imageFiles) {
+/*	private void addImagesToPdf(String imageFiles) {
 		String pdfFile = storageDirectory + "report_" + imageFiles + ".pdf";
 		Rectangle layout = new Rectangle(PageSize.A4);
 		layout.setBackgroundColor(BaseColor.BLACK);
@@ -266,7 +267,7 @@ public class ChartViewerActivity extends Activity {
 		File file = new File(storageDirectory + imageFiles + ".png");
 		boolean deleted = file.delete();
 	}
-
+*/
 	class MyGestureDetector extends SimpleOnGestureListener {
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,

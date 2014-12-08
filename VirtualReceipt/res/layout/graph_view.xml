@@ -9,7 +9,8 @@
     <ViewFlipper
         android:id="@+id/view_flipper"
         android:layout_width="match_parent"
-        android:layout_height="368dp"
+        android:layout_height="350dp"
+        android:layout_weight="0.62"
         android:background="@drawable/background"
         android:onClick="exportPdf"
         android:paddingBottom="10dp"
@@ -58,7 +59,7 @@
         android:layout_gravity="center_horizontal|center"
         android:layout_marginTop="10dp"
         android:onClick="exportPdf"
-        android:text="Export as Pdf" />
+        android:text="Add chart to Pdf" />
 
     <TextView
         android:id="@+id/textView1"
