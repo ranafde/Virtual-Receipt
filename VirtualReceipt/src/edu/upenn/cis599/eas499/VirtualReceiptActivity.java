@@ -14,7 +14,10 @@ import edu.upenn.cis599.R.array;
 import edu.upenn.cis599.R.layout;
 import edu.upenn.cis599.charts.StatisticsViewerActivity;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.ListActivity;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,19 +32,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class VirtualReceiptActivity extends Activity {
-	private ReceiptDbAdapter mDbHelper;
+	
 	ListView lv;
 	ArrayList<String> menuArray;
 	private static final String TAG = "VirtualReceiptActivity.java";
 	
+	AlarmManager am;
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*mDbHelper = new ReceiptDbAdapter(this);
-        mDbHelper.open();
-        mDbHelper.updateBlobFields();
-        mDbHelper.close();*/
+
+        am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        setRepeatingAlarm();
         
         menuArray = new ArrayList<String>();
         menuArray.add(getResources().getString(R.string.add_income));
@@ -74,6 +77,14 @@ public class VirtualReceiptActivity extends Activity {
 //        ParseObject testObject = new ParseObject("TestObject");
 //        testObject.put("foo", "bar");
 //        testObject.saveInBackground();
+    }
+    
+    public void setRepeatingAlarm() {
+    	  Intent intent = new Intent(this, NotifyAlarm.class);
+    	  PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0,
+    	    intent, PendingIntent.FLAG_CANCEL_CURRENT);
+    	  am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+    	    (10 * 1000), pendingIntent);
     }
     
     class MyListener implements OnItemClickListener {
